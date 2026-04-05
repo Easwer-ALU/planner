@@ -14,15 +14,20 @@ const getIcon = (category: string) => {
   return Wallet; 
 };
 
+interface BudgetProps {
+  planType: string;
+  customBudget?: any[];
+  groupSize?: number;
+}
+
 export default function BudgetBreakdown({ 
   planType, 
-  customBudget 
-}: { 
-  planType: string; 
-  customBudget?: any[] 
-}) {
+  customBudget,
+  groupSize = 8 
+}: BudgetProps) {
   const is5Day = planType === "5-day";
 
+  // Logic: Use DB data if it exists, otherwise fall back to hardcoded defaults
   const displayItems = (customBudget && customBudget.length > 0) 
     ? customBudget 
     : is5Day 
@@ -105,7 +110,7 @@ export default function BudgetBreakdown({
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.2em] font-black text-[#1A3326]/30">Total per person</p>
-                  <p className="text-xs text-[#1A3326]/40 italic mt-0.5">Calculated for a crew of 8 members</p>
+                  <p className="text-xs text-[#1A3326]/40 italic mt-0.5">Calculated for a crew of {groupSize} members</p>
                 </div>
               </div>
               
@@ -124,8 +129,8 @@ export default function BudgetBreakdown({
 
         {/* Footer Note */}
         <div className="mt-12 text-center px-10">
-          <p className="text-xs text-[#1A3326]/30 leading-relaxed max-w-xl mx-auto">
-           
+          <p className="text-xs text-[#1A3326]/30 leading-relaxed max-w-xl mx-auto italic">
+            Note: This breakdown excludes personal shopping and train snacks. We recommend carrying ₹2,000 extra in cash for local spice purchases.
           </p>
         </div>
       </div>
