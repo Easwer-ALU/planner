@@ -9,56 +9,56 @@ import {
 } from "lucide-react";
 
 const itineraries: any = {
-  "4-day": [
-    {
-      id: "alleppey-4",
-      tabLabel: "Day 1",
-      title: "The Backwater Bliss",
-      events: [
-        { icon: Train, time: "10:30 AM", cardTitle: "Alleppey Arrival", desc: "Arrival at Alleppey Station from Chennai. Private transfer to the jetty.", photoIndex: 0 },
-        { icon: Ship, time: "11:00 AM", cardTitle: "Houseboat Check-in", desc: "Board your private 4-bedroom floating villa. Settle in as the cruise begins.", photoIndex: 1 },
-        { icon: Utensils, time: "12:30 PM", cardTitle: "Kerala Feast", desc: "Lunch with a great view of the backwaters. Fresh fish can be booked.", photoIndex: 2 },
-        { icon: Sunset, time: "06:00 PM", cardTitle: "Sunset Shikara Ride", desc: "Switch to a small Shikara to navigate the narrow 'hidden' canals.", photoIndex: 3 },
-      ],
-      photos: ["/allepey.jpg", "/houseboat.webp", "/meal.jpg", "/shikara.jpg"]
-    },
-    {
-      id: "thekkady-4",
-      tabLabel: "Day 2",
-      title: "Into the Wild",
-      events: [
-        { icon: Car, time: "09:30 AM", cardTitle: "Highland Drive", desc: "Scenic 4-hour climb into the spice hills of Kumily.", photoIndex: 0 },
-        { icon: Leaf, time: "02:30 PM", cardTitle: "Spice Plantation Tour", desc: "A sensory walk through fresh cardamom, pepper, and cinnamon gardens.", photoIndex: 1 },
-        { icon: Ship, time: "03:30 PM", cardTitle: "Periyar Boat Safari", desc: "Catch the late afternoon boat on Lake Periyar to spot wild elephants.", photoIndex: 2 },
-        { icon: Home, time: "Night", cardTitle: "Homestay Rest", desc: "Dinner and overnight stay at a cozy Thekkady homestay.", photoIndex: 3 },
-      ],
-      photos: ["/drive.jpg", "/spice.jpg", "/periyar.jpg", "/cottage.jpg"]
-    },
-    {
-      id: "munnar-4",
-      tabLabel: "Day 3",
-      title: "Emerald Hills",
-      events: [
-        { icon: Mountain, time: "08:00 AM", cardTitle: "Lockhart Gap Road", desc: "3.5-hour journey to Munnar via the breathtaking Lockhart Gap views.", photoIndex: 0 },
-        { icon: Camera, time: "01:00 PM", cardTitle: "Rose Garden", desc: "A terraced paradise perfect for group photos among millions of blooms.", photoIndex: 1 },
-        { icon: Coffee, time: "02:00 PM", cardTitle: "Tea Museum Visit", desc: "Learn the history of 'Black Gold' and see heritage tea machinery.", photoIndex: 2 },
-        { icon: Megaphone, time: "03:30 PM", cardTitle: "Lakeside Circuit", desc: "Explore Mattupetty Dam, Echo Point, and Kundale Lake.", photoIndex: 3 },
-      ],
-      photos: ["/lockhart.jpg", "/rose.webp", "/tea.jpg", "/dam.jpg"]
-    },
-    {
-      id: "kochi-4",
-      tabLabel: "Day 4",
-      title: "Heritage & Sunsets",
-      events: [
-        { icon: Sunrise, time: "05:30 AM", cardTitle: "Roadside Sunrise", desc: "Catch the sun rising over mist-covered valleys at Pothamedu Viewpoint.", photoIndex: 0 },
-        { icon: Landmark, time: "02:30 PM", cardTitle: "Fort Kochi Heritage", desc: "Visit Mattancherry Palace and the historic Paradesi Synagogue.", photoIndex: 1 },
-        { icon: Sunset, time: "05:00 PM", cardTitle: "Chinese Fishing Nets", desc: "Final sunset walk by the iconic nets before heading to the station.", photoIndex: 2 },
-        { icon: Train, time: "09:00 PM", cardTitle: "Chennai Departure", desc: "Drop at Ernakulam Junction for the night train back home.", photoIndex: 3 },
-      ],
-      photos: ["/sunrise.jpg", "/fort.jpg", "/nets.jpg", "/departure.png"]
-    }
-  ],
+// Inside your itineraries object, update the "4-day" key:
+"4-day": [
+  {
+    id: "alleppey-4",
+    tabLabel: "Day 1",
+    title: "The Backwater Bliss",
+    events: [
+      { icon: Train, time: "09:30 AM", cardTitle: "Alleppey Arrival", desc: "Arrival at Alleppey Station. Private transfer to the jetty for houseboat boarding.", photoIndex: 0 },
+      { icon: Ship, time: "11:30 AM", cardTitle: "Private Villa Boarding", desc: "Check-in to your 4-bedroom houseboat.", photoIndex: 1 },
+      { icon: Utensils, time: "01:30 PM", cardTitle: "Monsoon Cruise", desc: "Navigate Vembanad Lake. The covered deck is perfect for music and seafood lunch.", photoIndex: 2 },
+      { icon: Sunset, time: "05:30 PM", cardTitle: "Hidden Canal Shikara", desc: "A 1-hour sunset cruise through the narrowest backwater arteries.", photoIndex: 3 },
+    ],
+    photos: ["/allepey.jpg", "/houseboat.webp", "/meal.jpg", "/shikara.jpg"]
+  },
+  {
+    id: "munnar-4",
+    tabLabel: "Day 2",
+    title: "The Tea Highlands",
+    events: [
+      { icon: Car, time: "10:00 AM", cardTitle: "Self-Drive Pickup", desc: "Pick up two rental cars at the jetty. Begin the 5-hour scenic climb to Munnar.", photoIndex: 0 },
+      { icon: Utensils, time: "01:30 PM", cardTitle: "Highland Lunch", desc: "Roadside stop for Kerala Beef Fry or Spicy Chicken Curry.", photoIndex: 1 },
+      { icon: Landmark, time: "04:30 PM", cardTitle: "KDHP Tea Museum", desc: "Indoor history tour of the tea estates—perfect for the afternoon mist.", photoIndex: 2 },
+      { icon: Home, time: "07:00 PM", cardTitle: "Munnar Stay", desc: "Check-in at a cozy homestay surrounded by tea gardens.", photoIndex: 3 },
+    ],
+    photos: ["/drive.jpg", "/spice.jpg", "/tea.jpg", "/cottage.jpg"]
+  },
+  {
+    id: "adventure-4",
+    tabLabel: "Day 3",
+    title: "Adventure & Shift",
+    events: [
+      { icon: Mountain, time: "11:30 AM", cardTitle: "Ripple Adventures", desc: "Ziplining and river crossing through the drizzle. Epic valley views.", photoIndex: 0 },
+      { icon: Car, time: "02:30 PM", cardTitle: "The Big Shift", desc: "Drive from Munnar down to the coast of Kochi. Stop by sights along the way.", photoIndex: 1 },
+      { icon: Landmark, time: "07:30 PM", cardTitle: "Kochi Arrival", desc: "Check-in at the heritage stay followed by dinner and walk.", photoIndex: 2 },
+    ],
+    photos: ["/ripple.webp", "/lockhart.jpg", "/fort.jpg"]
+  },
+  {
+    id: "kochi-4",
+    tabLabel: "Day 4",
+    title: "Heritage & Return",
+    events: [
+      { icon: Landmark, time: "11:30 AM", cardTitle: "Fort Kochi Tour", desc: "Chinese Fishing Nets and St. Francis Church. Last-minute Jew Town shopping.", photoIndex: 0 },
+      { icon: Utensils, time: "01:00 PM", cardTitle: "Seafood Lunch", desc: "Spicy local seafood at Fusion Bay or Kerala Cafe.", photoIndex: 1 },
+      { icon: Train, time: "06:00 PM", cardTitle: "Mattanchery Palace", desc: "Explore the historic palace and its surroundings.", photoIndex: 2 },
+      { icon: Train, time: "06:45 PM", cardTitle: "Station Departure", desc: "Board Train for the overnight journey back home.", photoIndex: 3 },
+    ],
+    photos: ["/nets.jpg", "/lunch.jpg", "/palace.jpg", "/departure.png"]
+  }
+],
   "5-day": [
     {
       id: "alleppey-5",

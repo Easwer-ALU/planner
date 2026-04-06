@@ -73,14 +73,14 @@ export default function AdminPanel() {
 
   if (!isAuthorized) {
     return (
-      <div className="h-screen flex items-center justify-center bg-[#1A3326] px-6 font-sans">
-        <div className="bg-white/5 p-10 rounded-[3rem] backdrop-blur-xl border border-white/10 w-full max-w-md shadow-2xl">
+      <div className="h-screen flex items-center justify-center bg-[#050807] px-6 font-sans">
+        <div className="bg-white/[0.02] p-10 rounded-[3rem] backdrop-blur-xl border border-white/10 w-full max-w-md shadow-2xl">
           <Lock className="text-[#E6A83C] mb-6" size={40} />
           <h1 className="text-white text-3xl font-serif font-bold mb-8 italic">Staff Only</h1>
           <input 
             type="password" 
             placeholder="Master Password"
-            className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white mb-6 outline-none focus:border-[#E6A83C] transition-all text-lg"
+            className="w-full bg-white/[0.02] border border-white/10 rounded-2xl p-4 text-white mb-6 outline-none focus:border-[#E6A83C] transition-all text-lg"
             onChange={(e) => setPassword(e.target.value)}
           />
           <button 

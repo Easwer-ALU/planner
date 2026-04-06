@@ -8,7 +8,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 const markerData: any = {
   "4-day": [
     { name: "Alleppey", coords: [76.3264, 9.4981] },
-    { name: "Thekkady", coords: [77.1396, 9.6062] },
+    
     { name: "Munnar", coords: [77.0595, 10.0889] },
     { name: "Kochi", coords: [76.2673, 9.9312] },
   ],
@@ -24,7 +24,7 @@ const markerData: any = {
 // 2. ROUTE WAYPOINTS: Every single place the car actually goes
 const routeWaypoints: any = {
   "4-day": [
-    [76.3264, 9.4981], [77.1396, 9.6062], [77.0595, 10.0889], [76.2673, 9.9312]
+    [76.3264, 9.4981],  [77.0595, 10.0889], [76.2673, 9.9312]
   ],
   "5-day": [
     [76.3264, 9.4981], // Alleppey

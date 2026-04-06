@@ -46,73 +46,60 @@ export default function BudgetBreakdown({
   const total = displayItems.reduce((sum, item) => sum + item.cost, 0);
 
   return (
-    <section className="py-20 md:py-32 bg-white text-[#1A3326] w-full font-sans">
-      <div className="max-w-4xl mx-auto px-4 md:px-6">
-        
-        <div className="text-center mb-12 md:mb-20">
-          <span className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-black text-[#E6A83C]">Financial Breakdown</span>
-          <h2 className="font-serif text-4xl md:text-6xl font-bold mt-2 mb-4 tracking-tight">The Ledger</h2>
-          <div className="flex flex-col items-center justify-center gap-3">
-            <p className="text-[#1A3326]/50 font-medium text-sm md:text-base">
-              {is5Day ? "Estimated costs for the 5-Day Icons Trail" : "Finalized budget for the 4-Day Monsoon Trail"}
-            </p>
-            {customBudget && (
-              <span className="bg-[#2C7A54]/10 text-[#2C7A54] text-[8px] uppercase font-black px-2.5 py-1 rounded-full border border-[#2C7A54]/20">Live Sync</span>
-            )}
-          </div>
+    <section className="py-20 md:py-32 bg-[#0A0F0D] text-[#E8F3ED] w-full font-sans transition-colors duration-700">
+    <div className="max-w-4xl mx-auto px-4 md:px-6">
+      
+      <div className="text-center mb-12 md:mb-20">
+        <span className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-black text-[#E6A83C]">Financial Breakdown</span>
+        <h2 className="font-serif text-4xl md:text-6xl font-bold mt-2 mb-4 tracking-tight text-white">The Ledger</h2>
+        <div className="flex flex-col items-center justify-center gap-3">
+          <p className="text-white/40 font-medium text-sm md:text-base">
+            {is5Day ? "Estimated costs for the 5-Day Icons Trail" : "Finalized budget for the 4-Day Monsoon Trail"}
+          </p>
         </div>
+      </div>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="bg-[#F9F8F6] rounded-[2.5rem] md:rounded-[3.5rem] border border-[#1A3326]/5 overflow-hidden shadow-2xl"
-        >
-          <div className="p-6 md:p-16">
-            <div className="space-y-8 md:space-y-10">
-              {displayItems.map((item, i) => {
-                const IconComponent = getIcon(item.category);
-                return (
-                  <div key={i} className="flex items-start justify-between group gap-4">
-                    <div className="flex items-center gap-3 md:gap-6">
-                      <div className="p-3 md:p-4 bg-white rounded-xl md:rounded-[1.5rem] text-[#E6A83C] shadow-sm shrink-0">
-                        <IconComponent size={18} />
-                      </div>
-                      <div>
-                        <p className="font-bold text-base md:text-xl tracking-tight text-[#1A3326] leading-tight">{item.category}</p>
-                        <p className="text-[10px] md:text-sm text-[#1A3326]/40 font-medium mt-0.5">{item.detail}</p>
-                      </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        className="bg-[#141C18] rounded-[2.5rem] md:rounded-[3.5rem] border border-white/5 overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)]"
+      >
+        <div className="p-6 md:p-16">
+          <div className="space-y-8 md:space-y-10">
+            {displayItems.map((item, i) => {
+              const IconComponent = getIcon(item.category);
+              return (
+                <div key={i} className="flex items-start justify-between group gap-4">
+                  <div className="flex items-center gap-3 md:gap-6">
+                    <div className="p-3 md:p-4 bg-white/5 rounded-xl md:rounded-[1.5rem] text-[#E6A83C] border border-white/10 group-hover:bg-[#E6A83C] group-hover:text-white transition-all duration-500">
+                      <IconComponent size={18} />
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-mono text-base md:text-xl font-black text-[#1A3326]">
-                        ₹{item.cost.toLocaleString()}
-                      </p>
+                    <div>
+                      <p className="font-bold text-base md:text-xl tracking-tight text-white leading-tight">{item.category}</p>
+                      <p className="text-[10px] md:text-sm text-white/30 font-medium mt-0.5">{item.detail}</p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="text-right shrink-0">
+                    <p className="font-mono text-base md:text-xl font-black text-[#E6A83C]">
+                      ₹{item.cost.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-            <div className="mt-12 md:mt-16 pt-10 md:pt-12 border-t border-[#1A3326]/5 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
-              <div className="flex items-center gap-4 text-center md:text-left">
-                <div className="p-2.5 md:p-3 bg-[#E6A83C]/10 rounded-xl">
-                  <Info size={18} className="text-[#E6A83C]" />
-                </div>
-                <div>
-                  <p className="text-[9px] uppercase tracking-widest font-black text-[#1A3326]/30">Per Person Total</p>
-                  <p className="text-[10px] text-[#1A3326]/40 italic mt-0.5">Crew of {groupSize} members</p>
-                </div>
-              </div>
-              
-              <div className="text-center md:text-right">
-                <p className="text-5xl md:text-7xl font-serif font-bold text-[#2C7A54] leading-none">
-                  ₹{total.toLocaleString()}
-                </p>
-              </div>
+          <div className="mt-12 md:mt-16 pt-10 md:pt-12 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
+             <div className="text-center md:text-right w-full">
+              <p className="text-5xl md:text-7xl font-serif font-bold text-[#2C7A54] leading-none drop-shadow-[0_0_30px_rgba(44,122,84,0.3)]">
+                ₹{total.toLocaleString()}
+              </p>
+              <p className="text-[10px] text-white/20 uppercase tracking-widest font-black mt-4">Total Per Person • Crew of {groupSize}</p>
             </div>
           </div>
-        </motion.div>
-      </div>
-    </section>
+        </div>
+      </motion.div>
+    </div>
+  </section>
   );
 }
