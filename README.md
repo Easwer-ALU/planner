@@ -1,20 +1,57 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+  <img width="1200" src="https://images.unsplash.com/photo-1593693397690-362cb9666fc2?q=80&w=1200" alt="Monsoon Trail Banner" />
+  
+  <br />
+  
+  # 🌴 The Monsoon Trail | Kerala Trip 2026
+  
+  **An immersive, high-performance expedition portal for the ultimate Kerala Monsoon adventure.**
+  
+  [![Vercel](https://img.shields.io/badge/Hosted_on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com)
+  [![MapLibre](https://img.shields.io/badge/Powered_by-MapLibre-blue?style=for-the-badge&logo=maplibre)](https://maplibre.org)
+  [![Firebase](https://img.shields.io/badge/Backend-Firebase-ffca28?style=for-the-badge&logo=firebase)](https://firebase.google.com)
+
 </div>
 
-# Run and deploy your AI Studio app
+---
 
-This contains everything you need to run your app locally.
+## 🌩️ Overview
 
-View your app in AI Studio: https://ai.studio/apps/f8bd12ea-6da5-4588-8c34-eba3983b2937
+The Monsoon Trail is a custom-built explorer designed to track and manage our 2026 expedition across the backwaters and hills of Kerala. Built with **React 19**, **Vite**, and **HeroUI**, it features a cinematic interface, real-time itinerary tracking, and an interactive spatial map of the entire trail.
 
-## Run Locally
+### Key Features
+- 🗺️ **Interactive Trail Map**: Real-time road routes and points of interest using MapLibre GL and OSRM.
+- 📅 **Dynamic Itinerary**: Real-time updates via Firebase Firestore.
+- 💰 **Budget Ledger**: Distributed expense tracking for the entire expedition crew.
+- 🌓 **Dynamic Themes**: Beautifully curated Dark and Light modes tailored for daylight and backwater nights.
+- 📱 **Mobile First**: Edge-to-edge immersive experience designed for exploration on the go.
 
-**Prerequisites:**  Node.js
+---
 
+## 🛠️ Development
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18+)
+
+### Setup
+1. **Clone the project**
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+3. **Configure Environment**
+   Create a `.env` file in the root directory (refer to `.env.example` if available).
+4. **Run Dev Server**
+   ```bash
+   npm run dev
+   ```
+
+## 🚀 Deployment
+
+The project is optimized for deployment on **Vercel**. Every push to the `main` branch triggers an automatic build and deployment.
+
+---
+
+<div align="center">
+  <sub>Built for the Monsoon Expedition 2026</sub>
+</div>

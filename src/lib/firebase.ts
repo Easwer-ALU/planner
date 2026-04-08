@@ -25,12 +25,20 @@ import {
   deleteObject 
 } from 'firebase/storage';
 
-// Import the Firebase configuration
-import firebaseConfig from '../../firebase-applet-config.json';
+// Firebase configuration using environment variables
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+};
 
 const app = initializeApp(firebaseConfig);
 // Re-enable the specific database ID as '(default)' was not found.
-export const db = getFirestore(app, "ai-studio-f8bd12ea-6da5-4588-8c34-eba3983b2937");
+export const db = getFirestore(app, import.meta.env.VITE_FIREBASE_FIRESTORE_DB_ID || "(default)");
 export const storage = getStorage(app);
 
 export { 

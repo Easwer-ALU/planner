@@ -6,3 +6,8 @@ coverage/
 *.log
 .env*
 !.env.example
+
+.vercel
+.env*.local
+firebase-applet-config.json
+
