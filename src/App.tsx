@@ -73,13 +73,25 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activeTab]);
 
+  const [itineraryDays, setItineraryDays] = useState(4); // Default to 4
+
   useEffect(() => {
     if (!isAuthReady) return;
 
     const settingsDoc = doc(db, "trip_settings", "main");
     const unsubscribeSettings = onSnapshot(settingsDoc, (snapshot) => {
       if (snapshot.exists()) {
-        setSettings(snapshot.data());
+        const data = snapshot.data();
+        setSettings(data);
+        
+        // Also fetch day count for the active plan
+        const planId = data.plan_type || "4-day";
+        const planDoc = doc(db, "itineraries", planId);
+        onSnapshot(planDoc, (planSnap) => {
+          if (planSnap.exists()) {
+            setItineraryDays(planSnap.data().days?.length || 4);
+          }
+        });
       } else {
         setSettings({ show_budget: true, plan_type: "4-day", group_size: 8 });
       }
@@ -201,7 +213,7 @@ export default function App() {
           >
             {activeTab === "overview" && (
               <>
-                <Hero planType={activePlan} groupSize={groupSize} activeBudgetTotal={calculatedTotal} />
+                <Hero planType={activePlan} groupSize={groupSize} activeBudgetTotal={calculatedTotal} dayCount={itineraryDays} />
                 <div className="px-6 md:px-12 max-w-7xl mx-auto w-full">
                   <BentoGrid activeBudgetTotal={calculatedTotal} groupSize={groupSize} setActiveTab={setActiveTab} />
                 </div>

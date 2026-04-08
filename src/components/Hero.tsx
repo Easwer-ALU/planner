@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { MapPin, Users, Calendar, ChevronDown, Receipt } from "lucide-react";
 
-export default function Hero({ planType = "4-day", groupSize = 8, activeBudgetTotal = 15500 }: { planType?: string; groupSize?: number; activeBudgetTotal?: number }) {
+export default function Hero({ planType = "4-day", groupSize = 8, activeBudgetTotal = 15500, dayCount = 4 }: { planType?: string; groupSize?: number; activeBudgetTotal?: number; dayCount?: number }) {
   const is5Day = planType === "5-day";
   const dateString = is5Day ? "June 19 — 23, 2026" : "June 19 — 22, 2026";
 
@@ -49,7 +49,7 @@ export default function Hero({ planType = "4-day", groupSize = 8, activeBudgetTo
           </div>
           <div className="glass px-8 py-3.5 rounded-full flex items-center gap-3 text-[var(--foreground)] shadow-xl border-black/[0.04] dark:border-white/10 group/pill hover:scale-105 transition-transform duration-500">
             <Calendar size={16} className="text-[var(--accent)]" />
-            <span className="text-[12px] font-black uppercase tracking-widest">{planType} Expedition</span>
+            <span className="text-[12px] font-black uppercase tracking-widest">{dayCount}-Day Expedition</span>
           </div>
           <div className="glass px-8 py-3.5 rounded-full flex items-center gap-3 text-[var(--foreground)] shadow-xl border-black/[0.04] dark:border-white/10 group/pill hover:scale-105 transition-transform duration-500">
             <Receipt size={16} className="text-[var(--accent)]" />
