@@ -35,6 +35,10 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
+// Validate Firebase configuration
+if (!firebaseConfig.apiKey) {
+  console.error("Firebase config is missing! Please add VITE_FIREBASE_API_KEY and other variables to your Vercel Project Settings.");
+}
 
 const app = initializeApp(firebaseConfig);
 // Re-enable the specific database ID as '(default)' was not found.
