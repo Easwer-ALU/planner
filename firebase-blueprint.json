@@ -1,0 +1,55 @@
+{
+  "entities": {
+    "TripSettings": {
+      "title": "Trip Settings",
+      "description": "Global settings for the Monsoon Trail trip, including budget and route version.",
+      "type": "object",
+      "properties": {
+        "show_budget": {
+          "type": "boolean",
+          "description": "Whether to display the budget breakdown on the public site."
+        },
+        "plan_type": {
+          "type": "string",
+          "enum": ["4-day", "5-day"],
+          "description": "The active itinerary version."
+        },
+        "group_size": {
+          "type": "integer",
+          "description": "The total number of friends in the crew."
+        },
+        "budget_4day": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "category": { "type": "string" },
+              "cost": { "type": "integer" },
+              "detail": { "type": "string" }
+            }
+          },
+          "description": "Budget items for the 4-day plan."
+        },
+        "budget_5day": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "category": { "type": "string" },
+              "cost": { "type": "integer" },
+              "detail": { "type": "string" }
+            }
+          },
+          "description": "Budget items for the 5-day plan."
+        }
+      },
+      "required": ["show_budget", "plan_type", "group_size"]
+    }
+  },
+  "firestore": {
+    "trip_settings/{settingsId}": {
+      "schema": "TripSettings",
+      "description": "Single document for global trip configuration (usually ID 'main')."
+    }
+  }
+}

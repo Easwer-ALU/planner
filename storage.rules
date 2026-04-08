@@ -1,0 +1,9 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // Temporarily allow all reads and writes for debugging and initialization
+      allow read, write: if true;
+    }
+  }
+}

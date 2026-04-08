@@ -1,0 +1,5 @@
+{
+  "name": "The Monsoon Trail",
+  "description": "A premium, real-time trip portal for the Kerala 2026 expedition.",
+  "requestFramePermissions": ["geolocation"]
+}
