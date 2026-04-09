@@ -95,6 +95,20 @@ export default function App() {
 
   const [itineraryDays, setItineraryDays] = useState(4); // Default to 4
 
+  const activePlan = settings?.plan_type || "4-day";
+  const groupSize = settings?.group_size || 8;
+  
+  // Filter items for the active plan (Memoized to prevent flickering on scroll)
+  const activeBudget = useMemo(() => {
+    if (!settings) return [];
+    return budgetItems.filter(item => item.plan_type === activePlan);
+  }, [budgetItems, activePlan, settings]);
+
+  const calculatedTotal = useMemo(() => {
+    return activeBudget.reduce((sum, item) => sum + (Number(item.cost) || 0), 0) || 0;
+  }, [activeBudget]);
+
+
   useEffect(() => {
     if (!isAuthReady) return;
 
@@ -143,6 +157,8 @@ export default function App() {
     );
   }
 
+  // Data already memoized at component top level to follow Rules of Hooks
+
   if (showAuthPortal) {
     return (
       <AuthPortal 
@@ -174,17 +190,7 @@ export default function App() {
     );
   }
 
-  const activePlan = settings?.plan_type || "4-day";
-  const groupSize = settings?.group_size || 8;
-  
-  // Filter items for the active plan (Memoized to prevent flickering on scroll)
-  const activeBudget = useMemo(() => {
-    return budgetItems.filter(item => item.plan_type === activePlan);
-  }, [budgetItems, activePlan]);
-
-  const calculatedTotal = useMemo(() => {
-    return activeBudget.reduce((sum, item) => sum + (Number(item.cost) || 0), 0) || 0;
-  }, [activeBudget]);
+  // Data already memoized above at component level to follow Rules of Hooks
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] transition-colors duration-700 font-sans selection:bg-emerald-600/20">

@@ -75,7 +75,7 @@ export default function BudgetBreakdown({
                   <p className="text-xl md:text-3xl font-serif font-bold text-[var(--foreground)] tracking-tight">₹{(Number(item.cost) || 0).toLocaleString()}</p>
                   <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] opacity-30 text-[var(--foreground)]">Per Person</p>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
