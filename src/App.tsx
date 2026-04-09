@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sun, Moon, Home, Map, Receipt, Palmtree, CloudRain, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -174,12 +174,17 @@ export default function App() {
     );
   }
 
-  const activePlan = settings.plan_type || "4-day";
-  const groupSize = settings.group_size || 8;
+  const activePlan = settings?.plan_type || "4-day";
+  const groupSize = settings?.group_size || 8;
   
-  // Filter items for the active plan
-  const activeBudget = budgetItems.filter(item => item.plan_type === activePlan);
-  const calculatedTotal = activeBudget.reduce((sum, item) => sum + (Number(item.cost) || 0), 0) || 0;
+  // Filter items for the active plan (Memoized to prevent flickering on scroll)
+  const activeBudget = useMemo(() => {
+    return budgetItems.filter(item => item.plan_type === activePlan);
+  }, [budgetItems, activePlan]);
+
+  const calculatedTotal = useMemo(() => {
+    return activeBudget.reduce((sum, item) => sum + (Number(item.cost) || 0), 0) || 0;
+  }, [activeBudget]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] transition-colors duration-700 font-sans selection:bg-emerald-600/20">

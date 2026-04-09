@@ -56,9 +56,9 @@ export default function BudgetBreakdown({
           {displayItems.map((item: any, i: number) => {
             const Icon = getIcon(item.category || "");
             return (
-              <motion.div 
+              <div 
                 key={item.id || i}
-                className="flex items-center justify-between p-8 glass rounded-[3rem] group hover:bg-black/[0.01] dark:hover:bg-white/[0.02] transition-all duration-500"
+                className="flex items-center justify-between p-8 glass rounded-[3rem] group hover:bg-black/[0.01] dark:hover:bg-white/[0.02]"
               >
                 <div className="flex items-center gap-4 md:gap-8 min-w-0 pr-4">
                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-[1.2rem] md:rounded-[1.5rem] bg-black/[0.03] dark:bg-white/5 flex items-center justify-center text-emerald-600 dark:text-backwater-blue group-hover:scale-110 transition-transform shadow-inner shrink-0">
