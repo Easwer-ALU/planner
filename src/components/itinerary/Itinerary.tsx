@@ -21,7 +21,28 @@ export default function Itinerary({ planType = "4-day" }: { planType?: string })
   const [activeEventIndex, setActiveEventIndex] = useState(0);
   const [interactionSource, setInteractionSource] = useState<"scroll" | "interaction">("scroll");
   const eventRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [carouselWidth, setCarouselWidth] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (carouselRef.current) {
+        setCarouselWidth(carouselRef.current.offsetWidth);
+      }
+    };
+    
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    
+    // Initial delay to ensure page layout is settled
+    const timer = setTimeout(updateWidth, 500);
+    
+    return () => {
+      window.removeEventListener('resize', updateWidth);
+      clearTimeout(timer);
+    };
+  }, [currentData, activeDay]); // Update width when day or data changes too
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -150,6 +171,7 @@ export default function Itinerary({ planType = "4-day" }: { planType?: string })
           className="flex flex-col lg:grid lg:grid-cols-2 gap-12 md:gap-16 items-start"
         >
           <div 
+            ref={carouselRef}
             className={cn(
               "order-first lg:order-last w-full relative aspect-[16/10] lg:aspect-[4/5] rounded-[2.5rem] lg:rounded-[4rem] overflow-hidden glass group sticky top-4 lg:top-32 shadow-2xl transition-all duration-700 z-20 bg-black isolate",
               !isMobile && "hover:transform-none" // Disable all tilt on desktop
@@ -158,12 +180,15 @@ export default function Itinerary({ planType = "4-day" }: { planType?: string })
           >
             {/* Sliding Track for "Continuous Reel" feel */}
             <motion.div 
-              animate={{ x: `-${activeEventIndex * 100}%` }}
-              transition={{ duration: 0.85, ease: [0.19, 1, 0.22, 1] }} // Smoother cinematic motion
+              animate={{ x: -(activeEventIndex * carouselWidth) }}
+              transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }} // Refined cinematic motion
               className="absolute inset-0 flex w-full h-full cursor-grab active:cursor-grabbing"
               drag="x"
-              dragConstraints={{ left: -((dayData.events.length - 1) * 100), right: 0 }}
-              dragElastic={0.1}
+              dragConstraints={{ 
+                left: -((dayData.events.length - 1) * carouselWidth), 
+                right: 0 
+              }}
+              dragElastic={0.2}
               onDragEnd={(_, info) => {
                 const threshold = 50;
                 if (info.offset.x < -threshold && activeEventIndex < dayData.events.length - 1) {
@@ -203,8 +228,7 @@ export default function Itinerary({ planType = "4-day" }: { planType?: string })
               </div>
             </div>
 
-            {/* Swipe Indicator Overlay (Mobile) */}
-            <div className="absolute top-6 right-6 lg:hidden flex items-center gap-2 px-3 py-1.5 glass rounded-full opacity-40 pointer-events-none">
+            <div className="absolute top-6 right-6 lg:hidden flex items-center gap-2 px-3 py-1.5 glass-dark rounded-full shadow-lg border border-white/10 pointer-events-none">
               <span className="text-[8px] font-black uppercase tracking-widest text-white italic">Swipe Snapshot</span>
             </div>
           </div>

@@ -7,9 +7,10 @@ import { db, OperationType, handleFirestoreError, doc, setDoc, collection, addDo
 interface AdminPanelProps {
   initialSettings: any;
   budgetItems: any[];
+  onExit?: () => void;
 }
 
-export default function AdminPanel({ initialSettings, budgetItems }: AdminPanelProps) {
+export default function AdminPanel({ initialSettings, budgetItems, onExit }: AdminPanelProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [availablePlans, setAvailablePlans] = useState<any[]>([]);
@@ -131,7 +132,7 @@ export default function AdminPanel({ initialSettings, budgetItems }: AdminPanelP
   const totalBudget = currentPlanBudget.reduce((sum, item) => sum + (Number(item.cost) || 0), 0);
 
   return (
-    <div className="min-h-screen py-20 px-6 max-w-5xl mx-auto space-y-16 pb-32">
+    <div className="min-h-screen pt-12 md:pt-28 pb-32 px-4 md:px-12 max-w-5xl mx-auto space-y-12 md:space-y-16">
       
       {/* Nice Toast Notification */}
       <AnimatePresence>
@@ -162,12 +163,18 @@ export default function AdminPanel({ initialSettings, budgetItems }: AdminPanelP
           <p className="text-xs font-black uppercase tracking-[0.4em] opacity-40 text-[var(--foreground)]">The Mission Control</p>
           <h1 className="font-serif text-5xl md:text-6xl font-bold tracking-tight text-[var(--foreground)]">Trail Settings</h1>
         </div>
-        <div className="flex items-center gap-6">
-          <div className="px-6 py-3.5 glass rounded-2xl text-emerald-600 dark:text-emerald-400 flex items-center gap-3 border border-emerald-600/10 shadow-lg shadow-emerald-600/5">
+        <div className="flex items-center gap-4 md:gap-6">
+          <div className="hidden sm:flex px-6 py-3.5 glass rounded-2xl text-emerald-600 dark:text-emerald-400 items-center gap-3 border border-emerald-600/10 shadow-lg shadow-emerald-600/5">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
             <span className="text-[11px] font-black uppercase tracking-[0.2em]">Live Sync Active</span>
           </div>
-          <button onClick={handleLogout} className="p-5 glass rounded-2xl text-red-500 hover:bg-red-500/10 transition-all border border-black/[0.05] dark:border-white/10 shadow-xl">
+          <button 
+            onClick={onExit} 
+            className="px-6 py-3.5 glass rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black/[0.04] dark:hover:bg-white/10 transition-all border border-black/[0.05] dark:border-white/10 shadow-xl text-[var(--foreground)]"
+          >
+            Exit Control
+          </button>
+          <button onClick={handleLogout} className="p-4 md:p-5 glass rounded-2xl text-red-500 hover:bg-red-500/10 transition-all border border-black/[0.05] dark:border-white/10 shadow-xl">
             <LogOut size={20} />
           </button>
         </div>
@@ -282,9 +289,9 @@ export default function AdminPanel({ initialSettings, budgetItems }: AdminPanelP
               <Receipt size={32} />
             </div>
             <div className="space-y-1">
-              <div className="flex items-center gap-4">
-                <h2 className="text-4xl font-serif font-bold tracking-tight text-[var(--foreground)]">Budget Itinerary</h2>
-                <div className="px-4 py-1.5 bg-black/[0.02] dark:bg-white/5 border border-black/[0.05] dark:border-white/10 rounded-full">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <h2 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-[var(--foreground)]">Budget Itinerary</h2>
+                <div className="w-fit px-4 py-1.5 bg-black/[0.02] dark:bg-white/5 border border-black/[0.05] dark:border-white/10 rounded-full">
                   <span className="text-[10px] font-black uppercase tracking-widest opacity-30 mr-2 text-[var(--foreground)]">Total</span>
                   <span className="text-sm font-bold text-emerald-700 dark:text-backwater-amber">₹{totalBudget.toLocaleString()}</span>
                 </div>
@@ -310,7 +317,7 @@ export default function AdminPanel({ initialSettings, budgetItems }: AdminPanelP
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="group relative glass p-8 md:p-12 rounded-[3.5rem] border border-black/[0.05] dark:border-white/10 space-y-8 hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-colors shadow-sm"
+                className="group relative glass p-6 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] border border-black/[0.05] dark:border-white/10 space-y-6 md:space-y-8 hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-colors shadow-sm overflow-hidden"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                   <div className="space-y-3">
@@ -320,7 +327,7 @@ export default function AdminPanel({ initialSettings, budgetItems }: AdminPanelP
                       defaultValue={item.category}
                       placeholder="e.g., Transport"
                       onBlur={(e) => updateBudgetItemField(item.id, 'category', e.target.value)}
-                      className="w-full bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/10 px-8 py-5 rounded-[1.8rem] text-[var(--foreground)] font-bold outline-none focus:ring-2 ring-emerald-600/20 dark:ring-backwater-amber/20 transition-all shadow-inner"
+                      className="w-full bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/10 px-6 md:px-8 py-4 md:py-5 rounded-2xl md:rounded-[1.8rem] text-[var(--foreground)] font-bold outline-none focus:ring-2 ring-emerald-600/20 dark:ring-backwater-amber/20 transition-all shadow-inner text-sm md:text-base"
                     />
                   </div>
                   <div className="space-y-3">
@@ -330,7 +337,7 @@ export default function AdminPanel({ initialSettings, budgetItems }: AdminPanelP
                       defaultValue={item.cost}
                       placeholder="2500"
                       onBlur={(e) => updateBudgetItemField(item.id, 'cost', e.target.value)}
-                      className="w-full bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/10 px-8 py-5 rounded-[1.8rem] text-[var(--foreground)] font-bold outline-none focus:ring-2 ring-emerald-600/20 dark:ring-backwater-amber/20 transition-all shadow-inner"
+                      className="w-full bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/10 px-6 md:px-8 py-4 md:py-5 rounded-2xl md:rounded-[1.8rem] text-[var(--foreground)] font-bold outline-none focus:ring-2 ring-emerald-600/20 dark:ring-backwater-amber/20 transition-all shadow-inner text-sm md:text-base"
                     />
                   </div>
                 </div>
@@ -342,7 +349,7 @@ export default function AdminPanel({ initialSettings, budgetItems }: AdminPanelP
                     defaultValue={item.detail}
                     placeholder="Train from Kochi..."
                     onBlur={(e) => updateBudgetItemField(item.id, 'detail', e.target.value)}
-                    className="w-full bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/10 px-8 py-5 rounded-[1.8rem] text-[var(--foreground)] font-medium opacity-80 outline-none focus:ring-2 ring-emerald-600/20 dark:ring-backwater-amber/20 transition-all shadow-inner"
+                    className="w-full bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/10 px-6 md:px-8 py-4 md:py-5 rounded-2xl md:rounded-[1.8rem] text-[var(--foreground)] font-medium opacity-80 outline-none focus:ring-2 ring-emerald-600/20 dark:ring-backwater-amber/20 transition-all shadow-inner text-sm md:text-base"
                   />
                 </div>
 

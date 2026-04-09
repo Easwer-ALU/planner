@@ -53,6 +53,12 @@
   backdrop-filter: blur(32px);
 }
 
+.glass-dark {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Interactive elements */
 button, a {
   @apply transition-all duration-300;

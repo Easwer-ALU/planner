@@ -36,24 +36,24 @@ export default function Hero({ planType = "4-day", groupSize = 8, activeBudgetTo
             </span>
           </div>
 
-          <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-white font-bold leading-none tracking-tight">
+          <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-white font-bold leading-[1.25] md:leading-none tracking-tight transition-all duration-700">
             The Monsoon <br />
-            <span className="italic font-normal opacity-90 text-coconut-sunset dark:text-backwater-amber">Trail</span>
+            <span className="italic font-normal opacity-90 text-coconut-sunset dark:text-backwater-amber mt-3 block md:inline">Trail</span>
           </h1>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
-          <div className="glass px-8 py-3.5 rounded-full flex items-center gap-3 text-[var(--foreground)] shadow-xl border-black/[0.04] dark:border-white/10 group/pill hover:scale-105 transition-transform duration-500">
-            <Users size={16} className="text-[var(--accent)]" />
-            <span className="text-[12px] font-black uppercase tracking-widest">{groupSize} Friends</span>
+        <div className="flex flex-wrap items-center justify-center gap-2 md:gap-6 mt-16 md:mt-12 px-4 max-w-xl mx-auto">
+          <div className="glass px-4 md:px-8 py-2 md:py-3.5 rounded-full flex items-center gap-2 md:gap-3 text-[var(--foreground)] shadow-xl border-black/[0.04] dark:border-white/10 group/pill hover:scale-105 transition-all duration-500">
+            <Users size={12} className="text-[var(--accent)] md:w-4 md:h-4" />
+            <span className="text-[9px] md:text-[12px] font-black uppercase tracking-widest">{groupSize} Friends</span>
           </div>
-          <div className="glass px-8 py-3.5 rounded-full flex items-center gap-3 text-[var(--foreground)] shadow-xl border-black/[0.04] dark:border-white/10 group/pill hover:scale-105 transition-transform duration-500">
-            <Calendar size={16} className="text-[var(--accent)]" />
-            <span className="text-[12px] font-black uppercase tracking-widest">{dayCount}-Day Expedition</span>
+          <div className="glass px-4 md:px-8 py-2 md:py-3.5 rounded-full flex items-center gap-2 md:gap-3 text-[var(--foreground)] shadow-xl border-black/[0.04] dark:border-white/10 group/pill hover:scale-105 transition-all duration-500">
+            <Calendar size={12} className="text-[var(--accent)] md:w-4 md:h-4" />
+            <span className="text-[9px] md:text-[12px] font-black uppercase tracking-widest">{dayCount}-Day Expedition</span>
           </div>
-          <div className="glass px-8 py-3.5 rounded-full flex items-center gap-3 text-[var(--foreground)] shadow-xl border-black/[0.04] dark:border-white/10 group/pill hover:scale-105 transition-transform duration-500">
-            <Receipt size={16} className="text-[var(--accent)]" />
-            <span className="text-[12px] font-black uppercase tracking-widest">₹{formattedBudgetTotal}k Total</span>
+          <div className="glass px-4 md:px-8 py-2 md:py-3.5 rounded-full flex items-center gap-2 md:gap-3 text-[var(--foreground)] shadow-xl border-black/[0.04] dark:border-white/10 group/pill hover:scale-105 transition-all duration-500">
+            <Receipt size={12} className="text-[var(--accent)] md:w-4 md:h-4" />
+            <span className="text-[9px] md:text-[12px] font-black uppercase tracking-widest">₹{formattedBudgetTotal}k Total</span>
           </div>
         </div>
       </div>

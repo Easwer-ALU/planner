@@ -51,9 +51,9 @@ export default function BentoGrid({ activeBudgetTotal = 15500, groupSize = 8, se
           <Users className="text-[var(--primary)]" size={24} />
           <span className="text-[10px] font-black uppercase tracking-widest opacity-40 text-[var(--foreground)]">Group</span>
         </div>
-        <div>
-          <p className="text-5xl font-serif font-bold italic text-[var(--foreground)]">{groupSize}</p>
-          <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest text-[var(--foreground)]">Explorers</p>
+        <div className="relative">
+          <p className="text-4xl md:text-5xl font-serif font-bold italic text-[var(--foreground)]">{groupSize}</p>
+          <p className="text-[10px] md:text-[11px] font-bold opacity-40 uppercase tracking-widest text-[var(--foreground)] mt-1">Explorers</p>
         </div>
         <div className="flex -space-x-2 mt-4 text-[var(--foreground)]">
           {[...Array(4)].map((_, i) => (

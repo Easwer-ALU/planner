@@ -160,6 +160,33 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
     }
   };
 
+  const fitMapToTrail = () => {
+    if (!map.current || placesRef.current.length === 0) return;
+    
+    const bounds = new maplibregl.LngLatBounds();
+    const currentMode = activeModeRef.current;
+    
+    // Use all places in explore mode, or just route stops in route mode
+    const targets = currentMode === "route" ? placesRef.current.filter(p => p.isRouteStop) : placesRef.current;
+    
+    if (targets.length === 0) return;
+    
+    targets.forEach(p => {
+      if (p.coords && !isNaN(p.coords[0])) {
+        bounds.extend(p.coords);
+      }
+    });
+
+    const isMobile = window.innerWidth < 768;
+    map.current.fitBounds(bounds, {
+      padding: isMobile 
+        ? { top: 140, bottom: 100, left: 50, right: 50 } 
+        : { top: 120, bottom: 100, left: 150, right: 150 },
+      maxZoom: isMobile ? 11 : 12,
+      duration: 2000
+    });
+  };
+
   useEffect(() => {
     if (!mapContainer.current) return;
 
@@ -168,8 +195,8 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
     map.current = new maplibregl.Map({
       container: mapContainer.current,
       style: isDark ? "https://tiles.openfreemap.org/styles/dark" : "https://tiles.openfreemap.org/styles/liberty",
-      center: [76.7, 9.8],
-      zoom: 8.5,
+      center: [76.5, 10.0], // Neutral starting point before bounds fit
+      zoom: 7,
       attributionControl: false
     });
 
@@ -268,6 +295,9 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
       addMarkers();
       fetchRoute();
       updateTitles();
+      
+      // Auto-frame on first significant data load
+      setTimeout(fitMapToTrail, 100);
     };
 
     // Use 'idle' for post-initialization stability
@@ -303,12 +333,14 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
            addMarkers();
            fetchRoute();
            updateRouteVisibility();
+           fitMapToTrail();
            if ((map.current as any)._updateTitles) (map.current as any)._updateTitles();
        } else {
            map.current.once('idle', () => {
               addMarkers();
               fetchRoute();
               updateRouteVisibility();
+              fitMapToTrail();
               if ((map.current as any)._updateTitles) (map.current as any)._updateTitles();
            });
        }
@@ -318,12 +350,17 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
   // Center on selected place
   useEffect(() => {
     if (selectedPlace && map.current) {
+      const isMobile = window.innerWidth < 768;
       map.current.flyTo({
         center: selectedPlace.coords,
         zoom: activeMode === "explore" ? 12 : 9,
         speed: 1.2,
         curve: 1.42,
-        padding: { top: 100, bottom: 250, left: 100, right: 100 }
+        // On mobile, use large bottom padding to push the pin into the upper viewport 
+        // away from the expanded info card.
+        padding: isMobile 
+          ? { top: 80, bottom: 380, left: 50, right: 50 } 
+          : { top: 100, bottom: 250, left: 100, right: 100 }
       });
     }
   }, [selectedPlace]);
@@ -396,8 +433,8 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
         )}
 
       {/* Immersive Map Container */}
-      <div className="relative h-screen md:h-[750px] w-full md:rounded-[4rem] overflow-hidden md:glass md:border border-white/5 md:shadow-2xl">
-        <div ref={mapContainer} className="absolute inset-0 w-full h-full" />
+      <div className="relative h-[100dvh] md:h-[750px] w-full md:rounded-[4rem] overflow-hidden md:glass md:border border-white/5 md:shadow-2xl selection:bg-none">
+        <div ref={mapContainer} className="absolute inset-0 w-full h-full touch-none" />
         
         {/* Mobile Header Overlay */}
         <div className="md:hidden absolute top-0 left-0 right-0 p-8 pt-12 z-20 pointer-events-none bg-gradient-to-b from-[var(--background)] via-[var(--background)]/80 to-transparent">
@@ -427,40 +464,69 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
           </div>
         )}
 
-        {/* Selected Place Detail Card */}
-        <AnimatePresence>
+        {/* Selected Place Detail Card - Now Swipable */}
+        <AnimatePresence mode="wait">
           {selectedPlace && (
             <motion.div 
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 20, opacity: 0 }}
-                className="absolute left-6 right-6 bottom-40 md:left-12 md:bottom-12 md:w-96 z-[60]"
+                className="absolute left-4 right-4 bottom-26 md:left-12 md:bottom-12 md:w-96 z-[60]"
             >
-              <div className="glass p-5 rounded-[2rem] border-white/10 shadow-2xl space-y-5 relative overflow-hidden group">
+              <div className="glass p-5 rounded-[2.5rem] border-white/10 shadow-2xl space-y-5 relative overflow-hidden group">
                 <button onClick={() => setSelectedPlace(null)} className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/10 hover:bg-black/20 transition-colors text-white">
                   <X size={14} />
                 </button>
-                <div className="h-40 -mx-5 -mt-5 relative overflow-hidden">
-                  <img src={selectedPlace.image} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-3 left-5">
-                    <span className="px-3 py-1 rounded-full bg-emerald-600 text-white text-[7px] font-black uppercase tracking-widest">{selectedPlace.category}</span>
+                
+                <motion.div 
+                  key={selectedPlace.id}
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -20, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-5"
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.2}
+                  onDragEnd={(_, info) => {
+                    const threshold = 50;
+                    const currentIndex = places.findIndex(p => p.id === selectedPlace.id);
+                    if (info.offset.x < -threshold && currentIndex < places.length - 1) {
+                      setSelectedPlace(places[currentIndex + 1]);
+                    } else if (info.offset.x > threshold && currentIndex > 0) {
+                      setSelectedPlace(places[currentIndex - 1]);
+                    }
+                  }}
+                >
+                  <div className="h-32 md:h-44 -mx-5 -mt-5 relative overflow-hidden">
+                    <img src={selectedPlace.image} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-3 left-5">
+                      <span className="px-3 py-1 rounded-full bg-emerald-600 text-white text-[7px] font-black uppercase tracking-widest">{selectedPlace.category}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-1.5 text-left">
-                  <h4 className="text-lg font-serif font-bold text-[var(--foreground)]">{selectedPlace.name}</h4>
-                  <p className="text-[10px] leading-relaxed opacity-60 text-[var(--foreground)]">{selectedPlace.desc}</p>
-                </div>
-                </div>
+                  <div className="space-y-1.5 text-left">
+                    <h4 className="text-xl font-serif font-bold text-[var(--foreground)]">{selectedPlace.name}</h4>
+                    <p className="text-[11px] leading-relaxed opacity-60 text-[var(--foreground)]">{selectedPlace.desc}</p>
+                  </div>
+                  
+                  {/* Visual Swipe Hint */}
+                  <div className="flex justify-center gap-1.5 opacity-20 group-hover:opacity-40 transition-opacity">
+                    {places.slice(0, 10).map((_, i) => (
+                      <div key={i} className={cn("w-1 h-1 rounded-full bg-[var(--foreground)]", i === places.findIndex(p => p.id === selectedPlace.id) ? "scale-150 opacity-100" : "opacity-50")} />
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
-
+ 
         {/* Discovery Scroller */}
-        <div className={cn("absolute left-0 right-0 bottom-36 md:bottom-8 z-[60] transition-all px-6", (activeMode === "explore" && !selectedPlace) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none")}>
+        <div className={cn("absolute left-0 right-0 bottom-26 md:bottom-8 z-[60] transition-all px-6", (activeMode === "explore" && !selectedPlace) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none")}>
           <div className="flex gap-4 overflow-x-auto no-scrollbar snap-x">
             {places.map((place) => (
-              <button key={place.id} onClick={() => setSelectedPlace(place)} className="flex-shrink-0 snap-center glass p-3.5 rounded-3xl shadow-xl flex items-center gap-3 border-white/10 w-60">
+              <button key={place.id} onClick={() => setSelectedPlace(place)} className="flex-shrink-0 snap-center glass p-3.5 rounded-3xl shadow-xl flex items-center gap-3 border-white/10 w-64 md:w-60">
                 <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0"><img src={place.image} className="w-full h-full object-cover" /></div>
                 <div className="text-left overflow-hidden">
                   <p className="text-[7px] font-black uppercase tracking-widest text-emerald-600 mb-0.5">{place.category}</p>

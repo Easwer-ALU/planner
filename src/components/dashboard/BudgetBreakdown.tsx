@@ -58,18 +58,17 @@ export default function BudgetBreakdown({
             return (
               <motion.div 
                 key={item.id || i}
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05 }}
                 className="flex items-center justify-between p-8 glass rounded-[3rem] group hover:bg-black/[0.01] dark:hover:bg-white/[0.02] transition-all duration-500"
               >
                 <div className="flex items-center gap-4 md:gap-8 min-w-0 pr-4">
                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-[1.2rem] md:rounded-[1.5rem] bg-black/[0.03] dark:bg-white/5 flex items-center justify-center text-emerald-600 dark:text-backwater-blue group-hover:scale-110 transition-transform shadow-inner shrink-0">
                     <Icon size={24} />
                   </div>
-                  <div className="space-y-1 min-w-0 overflow-hidden">
-                    <h4 className="font-serif font-bold text-lg md:text-2xl leading-tight text-[var(--foreground)] truncate">{item.category || "Uncategorized"}</h4>
-                    <p className="text-[10px] md:text-sm opacity-40 font-bold uppercase tracking-widest text-[var(--foreground)] truncate">{item.detail || "No details provided"}</p>
+                  <div className="space-y-1 min-w-0 pr-2">
+                    <h4 className="font-serif font-bold text-lg md:text-2xl leading-tight text-[var(--foreground)]">{item.category || "Uncategorized"}</h4>
+                    {item.detail && item.detail !== "No details provided" && (
+                      <p className="text-[10px] md:text-xs opacity-40 font-bold uppercase tracking-[0.15em] text-[var(--foreground)] leading-relaxed">{item.detail}</p>
+                    )}
                   </div>
                 </div>
                 <div className="text-right space-y-1 shrink-0">

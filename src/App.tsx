@@ -37,6 +37,26 @@ export default function App() {
   // Reset scroll on tab change to prevent map/itinerary stickiness
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Lock body scroll only when map is active for immersive app feel
+    if (activeTab === "map") {
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
+      document.body.style.height = "100dvh";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+      document.body.style.height = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+      document.body.style.height = "";
+    };
   }, [activeTab]);
   const [authRole, setAuthRole] = useState<'none' | 'admin' | 'superadmin'>(() => {
     return (sessionStorage.getItem("auth_role") as 'none' | 'admin' | 'superadmin') || 'none';
@@ -142,16 +162,14 @@ export default function App() {
   if (authRole === 'admin') {
     return (
       <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] transition-colors duration-700">
-        <button 
-          onClick={() => {
+        <AdminPanel 
+          initialSettings={settings} 
+          budgetItems={budgetItems} 
+          onExit={() => {
             setAuthRole('none');
             sessionStorage.removeItem("auth_role");
           }}
-          className="fixed top-8 right-8 z-50 glass px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-black/[0.04] dark:hover:bg-white/10 transition-all border border-black/[0.05] dark:border-white/10 shadow-2xl text-[var(--foreground)]"
-        >
-          Exit Mission Control
-        </button>
-        <AdminPanel initialSettings={settings} budgetItems={budgetItems} />
+        />
       </div>
     );
   }
@@ -192,7 +210,10 @@ export default function App() {
       </nav>
 
       <main className={cn(
-        "flex-1 pb-32 md:pb-48 space-y-32 md:space-y-48",
+        "flex-1 transition-all duration-700",
+        activeTab === "map" 
+          ? "pb-0 space-y-0 h-[100dvh] overflow-hidden" 
+          : "pb-32 md:pb-48 space-y-32 md:space-y-48",
         activeTab === "overview" ? "pt-0" : 
         activeTab === "map" ? "pt-0 md:pt-40" : 
         "pt-28 md:pt-40"
@@ -240,7 +261,7 @@ export default function App() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="md:hidden fixed bottom-8 left-8 right-8 z-50 glass px-6 py-4 rounded-[2.5rem] flex items-center justify-around shadow-[0_30px_60px_rgba(0,0,0,0.2)] border-black/[0.04] dark:border-white/10"
+            className="md:hidden fixed bottom-4 left-4 right-4 z-50 glass px-6 py-4 rounded-[2.5rem] flex items-center justify-around shadow-[0_30px_60px_rgba(0,0,0,0.2)] border-black/[0.04] dark:border-white/10"
           >
             <button onClick={() => setActiveTab("overview")} className={cn("flex flex-col items-center gap-1.5 transition-all duration-500", activeTab === "overview" ? "text-emerald-700 dark:text-backwater-blue scale-110" : "opacity-30")}>
               <Home size={20} />
