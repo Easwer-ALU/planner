@@ -21,15 +21,33 @@ export default function Footer({ onAuthTrigger }: FooterProps) {
           <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.5em]">
             © THE MONSOON TRAIL 2026. ALL RIGHTS NOT RESERVED.
           </p>
-          <p className="text-[11px] uppercase tracking-[0.4em] text-white/20 font-black">
-            Curated with vibe coding by{" "}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
+            <p className="text-[11px] uppercase tracking-[0.4em] text-white/20 font-black">
+              Curated with vibe coding by{" "}
+              <button 
+                onClick={onAuthTrigger}
+                className="text-[#3A8EBA] opacity-100 italic font-bold hover:text-white transition-colors"
+              >
+                EASWER ALU
+              </button>
+            </p>
             <button 
-              onClick={onAuthTrigger}
-              className="text-[#3A8EBA] opacity-100 italic font-bold hover:text-white transition-colors"
+              onClick={() => {
+                const jokes = [
+                  "fix it yourself",
+                  "observant, aren't you, you little f**ker",
+                  "it's not a bug, it's a feature. deal with it.",
+                  "i'm currently on vacation. try again never.",
+                  "have you tried turning the internet off and on again?",
+                  "my code is flawless. it's your screen that's broken."
+                ];
+                alert(jokes[Math.floor(Math.random() * jokes.length)]);
+              }}
+              className="text-[11px] uppercase tracking-[0.4em] text-purple-400/50 hover:text-purple-400 font-black transition-colors"
             >
-              EASWER ALU
+              Report Bug
             </button>
-          </p>
+          </div>
         </div>
         
         <div className="flex gap-8 opacity-20">

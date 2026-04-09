@@ -38,8 +38,9 @@ export default function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // Lock body scroll only when map is active for immersive app feel
-    if (activeTab === "map") {
+    // Lock body scroll only when map is active for immersive app feel AND on mobile
+    const isMobile = window.innerWidth < 768;
+    if (activeTab === "map" && isMobile) {
       document.body.style.overflow = "hidden";
       document.body.style.position = "fixed";
       document.body.style.width = "100%";
