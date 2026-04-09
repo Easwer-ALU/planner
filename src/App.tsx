@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sun, Moon, Home, Map, Receipt, Palmtree, CloudRain, Compass } from "lucide-react";
+import { Sun, Moon, Home, Map, Receipt, Palmtree, CloudRain, Compass, Settings, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Hero from "@/components/Hero";
 import BentoGrid from "@/components/dashboard/BentoGrid";
@@ -59,7 +59,7 @@ export default function App() {
     };
   }, [activeTab]);
   const [authRole, setAuthRole] = useState<'none' | 'admin' | 'superadmin'>(() => {
-    return (sessionStorage.getItem("auth_role") as 'none' | 'admin' | 'superadmin') || 'none';
+    return (localStorage.getItem("auth_role") as 'none' | 'admin' | 'superadmin') || 'none';
   });
   const [showAuthPortal, setShowAuthPortal] = useState(false);
   const [settings, setSettings] = useState<any>(null);
@@ -69,7 +69,7 @@ export default function App() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 400);
+      setScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -94,6 +94,16 @@ export default function App() {
   }, [activeTab]);
 
   const [itineraryDays, setItineraryDays] = useState(4); // Default to 4
+
+  const handleAdminEntry = () => {
+    const storedRole = localStorage.getItem("auth_role");
+    if (storedRole === 'admin' || storedRole === 'superadmin') {
+      setAuthRole(storedRole as any);
+      setActiveTab('admin');
+    } else {
+      setShowAuthPortal(true);
+    }
+  };
 
   const activePlan = settings?.plan_type || "4-day";
   const groupSize = settings?.group_size || 8;
@@ -166,31 +176,14 @@ export default function App() {
         onSuccess={(role) => {
           setAuthRole(role);
           setShowAuthPortal(false);
+          setActiveTab('admin');
         }} 
       />
     );
   }
 
-  if (authRole === 'superadmin') {
-    return <SuperAdminPanel />;
-  }
-
-  if (authRole === 'admin') {
-    return (
-      <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] transition-colors duration-700">
-        <AdminPanel 
-          initialSettings={settings} 
-          budgetItems={budgetItems} 
-          onExit={() => {
-            setAuthRole('none');
-            sessionStorage.removeItem("auth_role");
-          }}
-        />
-      </div>
-    );
-  }
-
   // Data already memoized above at component level to follow Rules of Hooks
+
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] transition-colors duration-700 font-sans selection:bg-emerald-600/20">
@@ -206,6 +199,11 @@ export default function App() {
         <button onClick={() => setActiveTab("map")} className={cn("text-[11px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100", activeTab === "map" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Map</button>
         <button onClick={() => setActiveTab("ledger")} className={cn("text-[11px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100", activeTab === "ledger" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Ledger</button>
         <button onClick={() => setActiveTab("weather")} className={cn("text-[11px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100", activeTab === "weather" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Weather</button>
+        
+        {authRole !== 'none' && (
+          <button onClick={() => setActiveTab("admin")} className={cn("text-[11px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 text-purple-600 dark:text-purple-400", activeTab === "admin" ? "opacity-100 scale-110" : "opacity-30")}>Settings</button>
+        )}
+
         
         <div className="w-[1px] h-6 bg-[var(--foreground)] opacity-10 mx-4" />
         
@@ -259,12 +257,20 @@ export default function App() {
                 <WeatherOverview variant="full" />
               </div>
             )}
+            {activeTab === "admin" && (
+              <AdminPanel 
+                initialSettings={settings} 
+                budgetItems={budgetItems} 
+                authRole={authRole}
+                onExit={() => setActiveTab("overview")} 
+              />
+            )}
           </motion.div>
         </AnimatePresence>
         
       </main>
       
-      <Footer onAuthTrigger={() => setShowAuthPortal(true)} />
+      <Footer onAuthTrigger={handleAdminEntry} />
 
       <AnimatePresence>
         {(activeTab !== "overview" || scrolled) && (
@@ -294,6 +300,14 @@ export default function App() {
               <CloudRain size={20} />
               <span className="text-[8px] font-black uppercase tracking-widest">Sky</span>
             </button>
+            
+            {authRole !== 'none' && (
+              <button onClick={() => setActiveTab("admin")} className={cn("flex flex-col items-center gap-1.5 transition-all duration-500", activeTab === "admin" ? "text-purple-600 dark:text-purple-400 scale-110" : "opacity-30")}>
+                <Settings size={20} />
+                <span className="text-[8px] font-black uppercase tracking-widest">Settings</span>
+              </button>
+            )}
+
             
             <div className="w-[1px] h-6 bg-[var(--foreground)] opacity-10" />
             

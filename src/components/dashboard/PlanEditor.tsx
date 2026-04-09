@@ -219,25 +219,26 @@ export default function PlanEditor({ plan: initialPlan, masterLibrary = [], onSa
   return (
     <div className="space-y-12 pb-32">
       {/* Editor Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/5 p-8 rounded-[2.5rem] border border-white/10">
-        <div className="space-y-4 w-full max-w-xl">
-          <label className="text-[10px] uppercase font-black tracking-widest text-[#8B5CF6]">Plan Name</label>
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-black/5 dark:bg-white/5 p-6 md:p-8 rounded-[2.5rem] border border-black/10 dark:border-white/10 shadow-inner">
+        <div className="space-y-2 w-full max-w-xl">
+          <label className="text-[10px] uppercase font-black tracking-widest text-purple-500 ml-4">Plan Name</label>
           <input
             type="text"
             value={plan.name}
             onChange={(e) => updatePlan("name", e.target.value)}
-            className="w-full bg-black/20 border border-white/10 rounded-2xl px-6 py-4 text-3xl font-serif font-bold focus:outline-none focus:border-purple-500/50 transition-colors"
+            className="w-full bg-transparent border-none rounded-2xl px-4 text-3xl md:text-4xl font-serif font-bold focus:outline-none transition-colors text-[var(--foreground)]"
           />
         </div>
         <div className="flex items-center gap-4">
-          <button onClick={onCancel} className="px-8 py-4 bg-black/20 hover:bg-black/40 rounded-full text-xs font-black uppercase tracking-widest transition-all text-white/50 hover:text-white">
+          <button onClick={onCancel} className="flex-1 lg:flex-none px-8 py-4 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full text-[10px] font-black uppercase tracking-widest transition-all text-[var(--foreground)] opacity-60">
             Cancel
           </button>
-          <button onClick={() => onSave(plan)} className="px-8 py-4 bg-purple-600 hover:bg-purple-500 rounded-full text-xs font-black uppercase tracking-widest transition-all shadow-[0_0_30px_rgba(147,51,234,0.3)] hover:shadow-[0_0_40px_rgba(147,51,234,0.5)] flex items-center gap-3">
-            <Save size={16} /> Save Plan
+          <button onClick={() => onSave(plan)} className="flex-1 lg:flex-none px-8 py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-purple-600/20 flex items-center justify-center gap-3">
+            <Save size={16} /> Save
           </button>
         </div>
       </div>
+
 
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -378,12 +379,16 @@ export default function PlanEditor({ plan: initialPlan, masterLibrary = [], onSa
                       <div className="grid grid-cols-1 gap-4">
                         {day.events?.map((evt: any, eIndex: number) => (
                           <div key={eIndex} className="bg-white/5 p-5 rounded-2xl flex flex-col gap-6 relative group border border-transparent hover:border-white/10 transition-colors">
+                          <div className="flex items-center justify-between">
+                            <h5 className="font-bold text-[10px] uppercase tracking-widest text-purple-400">Activity {eIndex + 1}</h5>
                             <button 
                               onClick={() => deleteEvent(dIndex, eIndex)}
-                              className="absolute -top-3 -right-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                              className="w-8 h-8 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-lg"
                             >
                               <X size={14} />
                             </button>
+                          </div>
+
 
                             <div className="flex flex-col md:flex-row gap-6">
                               <div className="space-y-4 flex-1">
@@ -512,7 +517,7 @@ export default function PlanEditor({ plan: initialPlan, masterLibrary = [], onSa
                                 <button 
                                     key={lp.id}
                                     onClick={() => importFromLibrary(lp)}
-                                    className="w-full bg-white/5 hover:bg-white/10 p-4 rounded-2xl flex items-center gap-5 transition-all text-left group"
+                                    className="w-full bg-white/5 hover:bg-white/10 p-4 rounded-2xl flex flex-col sm:flex-row items-center gap-5 transition-all text-left group"
                                 >
                                     <div className="w-16 h-16 rounded-xl overflow-hidden glass shrink-0">
                                         <img src={lp.image} className="w-full h-full object-cover" alt="" />
@@ -533,12 +538,16 @@ export default function PlanEditor({ plan: initialPlan, masterLibrary = [], onSa
           <div className="grid grid-cols-1 gap-4">
             {(plan.places || []).map((place: any, pIndex: number) => (
               <div key={place.id || pIndex} className="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col lg:flex-row gap-8 relative group">
-                <button 
-                  onClick={() => deletePlace(pIndex)}
-                  className="absolute -top-3 -right-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10"
-                >
-                  <X size={14} />
-                </button>
+                  <div className="flex items-center justify-between mb-4 lg:hidden">
+                     <h4 className="font-bold text-lg text-[var(--foreground)]">{place.name}</h4>
+                     <button 
+                       onClick={() => deletePlace(pIndex)}
+                       className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg"
+                     >
+                        <X size={14} />
+                     </button>
+                  </div>
+
 
                 <div className="w-full lg:w-48 shrink-0 space-y-4">
                   <div className="relative aspect-square glass rounded-[1.5rem] overflow-hidden border border-white/5">

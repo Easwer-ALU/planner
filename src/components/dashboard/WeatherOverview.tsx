@@ -1,7 +1,8 @@
-import { CloudRain, Sun, Cloud, Wind, Droplets, Eye } from "lucide-react";
+import { useState, useEffect } from "react";
+import { CloudRain, Sun, Cloud, Wind, Droplets, Eye, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const locations = [
+const defaultLocations = [
   { 
     name: "Alleppey", 
     weather: "Rainy", 
@@ -33,8 +34,8 @@ const locations = [
 
 const WeatherIcon = ({ condition, size = 20, className = "" }: { condition: string, size?: number, className?: string }) => {
   const cond = condition.toLowerCase();
-  if (cond.includes("rain")) return <CloudRain size={size} className={cn("text-emerald-600 dark:text-backwater-blue", className)} />;
-  if (cond.includes("mist") || cond.includes("cloud")) return <Cloud size={size} className={cn("text-[var(--foreground)] opacity-40 dark:opacity-60", className)} />;
+  if (cond.includes("rain") || cond.includes("storm")) return <CloudRain size={size} className={cn("text-emerald-600 dark:text-backwater-blue", className)} />;
+  if (cond.includes("mist") || cond.includes("cloud") || cond.includes("snow")) return <Cloud size={size} className={cn("text-[var(--foreground)] opacity-40 dark:opacity-60", className)} />;
   return <Sun size={size} className={cn("text-[var(--accent)]", className)} />;
 };
 
@@ -43,6 +44,58 @@ interface WeatherOverviewProps {
 }
 
 export default function WeatherOverview({ variant = 'full' }: WeatherOverviewProps) {
+  const [locations, setLocations] = useState<any[]>(defaultLocations);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchWeather = async () => {
+      try {
+        // Coordinates for Alleppey, Munnar, Kochi
+        const url = "https://api.open-meteo.com/v1/forecast?latitude=9.4981,10.0889,9.9312&longitude=76.3388,77.0595,76.2673&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,visibility&daily=temperature_2m_max,weather_code&timezone=Asia%2FKolkata";
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (Array.isArray(data) && data.length === 3) {
+            const mapCodeToWeather = (code: number) => {
+                if (code <= 3) return "Sunny"; // Clear / partly cloudy
+                if (code >= 45 && code <= 48) return "Misty";
+                if (code >= 51 && code <= 67) return "Rainy";
+                if (code >= 71 && code <= 77) return "Snowy";
+                if (code >= 80 && code <= 82) return "Rainy";
+                if (code >= 95) return "Stormy";
+                return "Cloudy";
+            };
+
+            const updatedLocations = [
+              { name: "Alleppey" },
+              { name: "Munnar" },
+              { name: "Kochi" }
+            ].map((loc, index) => {
+               const locData = data[index];
+               const current = locData.current;
+               const daily = locData.daily;
+               return {
+                  name: loc.name,
+                  weather: mapCodeToWeather(current.weather_code),
+                  temp: Math.round(current.temperature_2m),
+                  humidity: Math.round(current.relative_humidity_2m),
+                  wind: `${Math.round(current.wind_speed_10m)} km/h`,
+                  visibility: `${Math.round(current.visibility / 1000)} km`,
+                  forecast: daily.temperature_2m_max.slice(0, 3).map((t: number) => Math.round(t)),
+                  forecastCodes: daily.weather_code.slice(0, 3).map((c: number) => mapCodeToWeather(c))
+               };
+            });
+            setLocations(updatedLocations);
+        }
+      } catch (err) {
+        console.error("Failed to fetch weather data", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchWeather();
+  }, []);
+
   if (variant === 'mini') {
     return (
       <div className="h-full flex flex-col justify-between">
@@ -144,7 +197,7 @@ export default function WeatherOverview({ variant = 'full' }: WeatherOverviewPro
                     <p className="text-[10px] font-black opacity-30 uppercase text-[var(--foreground)] tracking-[0.3em]">Day {idx + 1}</p>
                     <div className="flex flex-col items-center gap-3">
                       <div className="p-4 bg-black/[0.02] dark:bg-white/5 rounded-2xl group-hover/day:bg-black/[0.05] transition-colors">
-                        <WeatherIcon condition={idx === 0 ? loc.weather : (idx === 1 ? "cloudy" : "sunny")} size={28} className="opacity-80" />
+                        <WeatherIcon condition={loc.forecastCodes ? loc.forecastCodes[idx] : loc.weather} size={28} className="opacity-80" />
                       </div>
                       <p className="text-3xl font-serif font-bold text-[var(--foreground)]">{t}°</p>
                     </div>

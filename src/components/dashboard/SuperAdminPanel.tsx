@@ -7,6 +7,10 @@ import { db, collection, getDocs, setDoc, doc, deleteDoc, updateDoc, OperationTy
 import PlanEditor from "./PlanEditor";
 
 export default function SuperAdminPanel() {
+  return <SuperAdminContent />;
+}
+
+export function SuperAdminContent() {
   const [itineraries, setItineraries] = useState<any[]>([]);
   const [masterLibrary, setMasterLibrary] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,8 +27,8 @@ export default function SuperAdminPanel() {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem("auth_role");
-    window.location.reload(); // Simple way to reset state in App.tsx
+    localStorage.clear();
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -33,7 +37,6 @@ export default function SuperAdminPanel() {
         let querySnapshot = await getDocs(collection(db, "itineraries"));
         let items: any[] = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // Improved Seeding & Migration Logic:
         const { itineraries: mockData } = await import('@/lib/itineraryData');
         const defaultIds = ["4-day", "5-day"];
         
@@ -41,12 +44,9 @@ export default function SuperAdminPanel() {
           const existing = items.find(item => item.id === planId) as any;
           const mockPlanDays = mockData[planId];
           const mockPlanPlaces = mockData.places?.[planId] || [];
-
-          // Migration check: If no places exist or if Day 1 Event still has coords (the old structure)
           const dbDay1Evt1 = existing?.days?.[0]?.events?.[0];
           
           if (!existing || (!existing.places?.length && mockPlanPlaces.length) || dbDay1Evt1?.coords) {
-            console.log(`Auto-migrating ${planId} to new Places structure...`);
             await setDoc(doc(db, "itineraries", planId), {
               id: planId,
               name: existing?.name || `${planId} Plan`,
@@ -57,17 +57,13 @@ export default function SuperAdminPanel() {
           }
         }
 
-        // Re-fetch after seeding/migration
         querySnapshot = await getDocs(collection(db, "itineraries"));
         items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
         setItineraries(items);
 
-        // Fetch Master Library
         const librarySnapshot = await getDocs(collection(db, "places"));
         const libraryItems = librarySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setMasterLibrary(libraryItems);
-
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -79,32 +75,23 @@ export default function SuperAdminPanel() {
 
   const toggleAvailability = async (id: string, currentStatus: boolean) => {
     try {
-      await updateDoc(doc(db, "itineraries", id), {
-        isAvailableForAdmin: !currentStatus
-      });
+      await updateDoc(doc(db, "itineraries", id), { isAvailableForAdmin: !currentStatus });
       setItineraries(prev => prev.map(p => p.id === id ? { ...p, isAvailableForAdmin: !currentStatus } : p));
       showNotify('success');
     } catch (error) {
       showNotify('error');
-      handleFirestoreError(error, OperationType.UPDATE, `itineraries/${id}`);
     }
   };
 
   const duplicatePlan = async (plan: any) => {
     const newId = "draft-" + Math.floor(Math.random() * 1000000);
     try {
-      const newPlan = {
-        ...plan,
-        id: newId,
-        name: `${plan.name} (Copy)`,
-        isAvailableForAdmin: false
-      };
+      const newPlan = { ...plan, id: newId, name: `${plan.name} (Copy)`, isAvailableForAdmin: false };
       await setDoc(doc(db, "itineraries", newId), newPlan);
       setItineraries(prev => [...prev, newPlan]);
       showNotify('success');
     } catch (error) {
       showNotify('error');
-      handleFirestoreError(error, OperationType.CREATE, `itineraries/${newId}`);
     }
   };
 
@@ -115,37 +102,24 @@ export default function SuperAdminPanel() {
         id: planId,
         name: "New Draft Plan",
         isAvailableForAdmin: false,
-        days: [
-          {
-            id: `day1-${planId}`,
-            tabLabel: "Day 1",
-            title: "Draft Day 1",
-            events: [],
-            photos: ["https://images.unsplash.com/photo-1593693397690-362cb9666fc2"]
-          }
-        ]
+        days: [{ id: `day1-${planId}`, tabLabel: "Day 1", title: "Draft Day 1", events: [], photos: ["https://images.unsplash.com/photo-1593693397690-362cb9666fc2"] }]
       };
       await setDoc(doc(db, "itineraries", planId), newPlan);
       setItineraries(prev => [...prev, newPlan]);
       showNotify('success');
     } catch (error) {
       showNotify('error');
-      handleFirestoreError(error, OperationType.CREATE, `itineraries/${planId}`);
     }
   };
+
   const savePlan = async (updatedPlan: any) => {
     try {
-      await updateDoc(doc(db, "itineraries", updatedPlan.id), {
-        name: updatedPlan.name,
-        days: updatedPlan.days,
-        places: updatedPlan.places || []
-      });
+      await updateDoc(doc(db, "itineraries", updatedPlan.id), { name: updatedPlan.name, days: updatedPlan.days, places: updatedPlan.places || [] });
       setItineraries(prev => prev.map(p => p.id === updatedPlan.id ? updatedPlan : p));
       setEditingPlan(null);
       showNotify('success');
     } catch (error) {
       showNotify('error');
-      handleFirestoreError(error, OperationType.UPDATE, `itineraries/${updatedPlan.id}`);
     }
   };
 
@@ -160,8 +134,6 @@ export default function SuperAdminPanel() {
         showNotify('success');
     } catch (error) {
         showNotify('error');
-        console.error("Save Master Place Error:", error);
-        handleFirestoreError(error, OperationType.UPDATE, `places/${place.id}`);
     }
   };
 
@@ -172,11 +144,12 @@ export default function SuperAdminPanel() {
         showNotify('success');
     } catch (error) {
         showNotify('error');
-        handleFirestoreError(error, OperationType.DELETE, `places/${id}`);
     }
   };
+
   return (
-    <div className="min-h-screen bg-[#0B0914] text-white transition-colors duration-700 py-20 px-6 font-sans selection:bg-purple-600/20">
+    <div className="py-12 transition-colors duration-700 font-sans selection:bg-purple-600/20">
+
       <AnimatePresence>
         {saveStatus !== 'idle' && (
           <motion.div 
@@ -197,23 +170,7 @@ export default function SuperAdminPanel() {
         )}
       </AnimatePresence>
 
-      <div className="max-w-6xl mx-auto space-y-16">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-white/10 pb-8">
-          <div className="space-y-2">
-            <p className="text-[#8B5CF6] text-xs font-black uppercase tracking-[0.4em]">Super Admin Protocol</p>
-            <h1 className="font-serif text-5xl md:text-6xl font-bold tracking-tight text-white">Itinerary Builder</h1>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="px-6 py-3.5 bg-purple-500/10 rounded-2xl text-purple-400 flex items-center gap-3 border border-purple-500/20">
-              <div className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
-              <span className="text-[11px] font-black uppercase tracking-[0.2em]">Master Control Active</span>
-            </div>
-            <button onClick={handleLogout} className="p-5 bg-red-500/10 rounded-2xl text-red-500 hover:bg-red-500 hover:text-white transition-all border border-red-500/20">
-              <LogOut size={20} />
-            </button>
-          </div>
-        </header>
-
+    <div className="max-w-6xl mx-auto space-y-16">
         {loading ? (
           <div className="py-32 flex justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
@@ -324,9 +281,10 @@ export default function SuperAdminPanel() {
           </div>
         ) : (
           <div className="space-y-8">
-            <div className="flex justify-between items-center px-4">
-              <h2 className="text-3xl font-serif font-bold tracking-tight">Active Plans</h2>
-              <div className="flex gap-4">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 px-4">
+              <h2 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-[var(--foreground)]">Active Plans</h2>
+              <div className="flex flex-wrap items-center gap-4">
+
                 <button 
                   disabled={isSyncing}
                   onClick={async () => {
@@ -369,16 +327,17 @@ export default function SuperAdminPanel() {
                 >
                   {isSyncing ? "Syncing..." : "Restore Templates"}
                 </button>
-                <div className="flex bg-white/5 p-1 rounded-full border border-white/10">
+                  <div className="flex bg-black/5 dark:bg-white/5 p-1 rounded-full border border-black/10 dark:border-white/10 shadow-inner">
                    <button 
                      onClick={() => setView('plans')}
-                     className={cn("px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", view === 'plans' ? "bg-purple-600 shadow-lg" : "opacity-40")}
+                     className={cn("px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", view === 'plans' ? "bg-purple-600 text-white shadow-lg" : "opacity-40 text-[var(--foreground)]")}
                    >Plans</button>
                    <button 
                      onClick={() => setView('library')}
-                     className={cn("px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", view === 'library' ? "bg-purple-600 shadow-lg" : "opacity-40")}
+                     className={cn("px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", view === 'library' ? "bg-purple-600 text-white shadow-lg" : "opacity-40 text-[var(--foreground)]")}
                    >Library</button>
                 </div>
+
                 <button 
                   onClick={view === 'plans' ? createNewPlan : () => {
                     const id = "place-" + Date.now();
@@ -410,19 +369,19 @@ export default function SuperAdminPanel() {
                     <div className="relative group">
                       {/* Expansion Trigger - Now a sibling, not a parent of buttons */}
                       <div 
-                        className="p-8 pr-48 flex items-center justify-between cursor-pointer hover:bg-white/[0.02] transition-colors"
+                        className="p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer hover:bg-white/[0.02] transition-colors"
                         onClick={() => setExpandedPlanId(expandedPlanId === plan.id ? null : plan.id)}
                       >
                         <div className="flex-1 space-y-3">
-                          <div className="flex items-center gap-4">
-                            <h3 className="text-2xl font-serif font-bold">{plan.name}</h3>
+                          <div className="flex flex-wrap items-center gap-4">
+                            <h3 className="text-2xl font-serif font-bold text-[var(--foreground)]">{plan.name}</h3>
                             {plan.id.startsWith('draft-') && (
                               <span className="px-3 py-1 bg-purple-500/10 text-purple-400 text-[9px] font-black uppercase tracking-widest rounded-full border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
                                 Draft Mode
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-6 opacity-40">
+                          <div className="flex flex-wrap items-center gap-6 opacity-40 text-[var(--foreground)]">
                             <div className="flex items-center gap-2">
                               <Calendar size={12} className="text-purple-400" />
                               <span className="text-[10px] font-black uppercase tracking-widest">{plan.days?.length || 0} Days</span>
@@ -433,66 +392,58 @@ export default function SuperAdminPanel() {
                                 {plan.days?.reduce((acc: number, day: any) => acc + (day.events?.length || 0), 0)} Events
                               </span>
                             </div>
-                            <span className="text-[9px] font-black uppercase tracking-widest ml-auto">ID: {plan.id}</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest">ID: {plan.id}</span>
+                          </div>
+                        </div>
+
+                        {/* Control Buttons - Now regular flex items */}
+                        <div className="flex items-center gap-3 md:gap-4 shrink-0" onClick={(e) => e.stopPropagation()}>
+                          <button 
+                            type="button"
+                            onClick={() => toggleAvailability(plan.id, plan.isAvailableForAdmin)}
+                            className={cn(
+                              "px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all border shrink-0",
+                              plan.isAvailableForAdmin ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-black/20 text-white/40 border-white/10"
+                            )}
+                          >
+                            {plan.isAvailableForAdmin ? 'Available' : 'Hidden'}
+                          </button>
+                          <div className="flex items-center gap-2">
+                            <button 
+                              type="button"
+                              onClick={() => setEditingPlan(plan)}
+                              className="p-2.5 md:p-3 bg-white/5 text-white/60 rounded-xl hover:bg-white/10 hover:text-white transition-all shadow-inner"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button 
+                              type="button"
+                              onClick={() => duplicatePlan(plan)}
+                              title="Duplicate Plan"
+                              className="p-2.5 md:p-3 bg-white/5 text-white/60 rounded-xl hover:bg-white/10 hover:text-white transition-all shadow-inner"
+                            >
+                              <Copy size={16} />
+                            </button>
+                            <button 
+                              type="button"
+                              onClick={async () => {
+                                if (!confirm("Are you sure you want to delete this plan?")) return;
+                                try {
+                                  await deleteDoc(doc(db, "itineraries", plan.id));
+                                  setItineraries(prev => prev.filter(p => p.id !== plan.id));
+                                  showNotify('success');
+                                } catch(err) {
+                                  showNotify('error');
+                                }
+                              }}
+                              className="p-2.5 md:p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all"
+                            >
+                              <Trash2 size={16} />
+                            </button>
                           </div>
                         </div>
                       </div>
 
-                      {/* Control Buttons - Absolute Positioned to sit on top of the header safely */}
-                      <div className="absolute top-1/2 -translate-y-1/2 right-8 z-[100] flex items-center gap-4">
-                        <button 
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleAvailability(plan.id, plan.isAvailableForAdmin);
-                          }}
-                          className={cn(
-                            "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border",
-                            plan.isAvailableForAdmin ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-black/20 text-white/40 border-white/10"
-                          )}
-                        >
-                          {plan.isAvailableForAdmin ? 'Available' : 'Hidden'}
-                        </button>
-                        <button 
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingPlan(plan);
-                          }}
-                          className="p-3 bg-white/5 text-white/60 rounded-xl hover:bg-white/10 hover:text-white transition-all shadow-inner"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button 
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            duplicatePlan(plan);
-                          }}
-                          title="Duplicate Plan"
-                          className="p-3 bg-white/5 text-white/60 rounded-xl hover:bg-white/10 hover:text-white transition-all shadow-inner"
-                        >
-                          <Copy size={16} />
-                        </button>
-                        <button 
-                          type="button"
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            try {
-                              await deleteDoc(doc(db, "itineraries", plan.id));
-                              setItineraries(prev => prev.filter(p => p.id !== plan.id));
-                              showNotify('success');
-                            } catch(err) {
-                              console.error("Delete Error:", err);
-                              showNotify('error');
-                              handleFirestoreError(err, OperationType.DELETE, `itineraries/${plan.id}`);
-                            }
-                          }}
-                          className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
                     </div>
   
                     {/* Quick View Expanded Content */}

@@ -17,10 +17,10 @@ export default function AuthPortal({ onCancel, onSuccess }: AuthPortalProps) {
     const superAdminPass = (import.meta as any).env.VITE_SUPERADMIN_PASSWORD || "SUPER_SECRET";
     
     if (password === adminPass) {
-      sessionStorage.setItem("auth_role", "admin");
+      localStorage.setItem("auth_role", "admin");
       onSuccess('admin');
     } else if (password === superAdminPass) {
-      sessionStorage.setItem("auth_role", "superadmin");
+      localStorage.setItem("auth_role", "superadmin");
       onSuccess('superadmin');
     } else {
       setError("Incorrect password. Access denied.");
