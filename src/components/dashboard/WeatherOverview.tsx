@@ -148,7 +148,7 @@ export default function WeatherOverview({ variant = 'full' }: WeatherOverviewPro
 
       <div className="grid grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3 gap-8 lg:gap-12">
         {locations.map((loc, i) => (
-          <div key={i} className="glass p-6 lg:p-8 xl:p-10 rounded-[2.5rem] lg:rounded-[3.5rem] border border-black/[0.04] dark:border-white/5 space-y-8 lg:space-y-12 group relative overflow-hidden">
+          <div key={i} className="glass p-6 lg:p-8 xl:p-10 rounded-[2.5rem] lg:rounded-[3.5rem] space-y-8 lg:space-y-12 group relative overflow-hidden">
             {/* Ambient Background Glow */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 blur-[100px] -mr-48 -mt-48 transition-all duration-1000 group-hover:bg-emerald-500/10" />
             

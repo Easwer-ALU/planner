@@ -156,7 +156,7 @@ export function SuperAdminContent() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-4 px-8 py-4 bg-white/5 border border-white/10 rounded-[2rem] shadow-2xl backdrop-blur-3xl"
+            className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-4 px-8 py-4 glass rounded-[2rem] shadow-2xl"
           >
             {saveStatus === 'success' ? (
               <CheckCircle2 className="text-green-400" size={24} />
@@ -184,14 +184,14 @@ export function SuperAdminContent() {
           />
         ) : editingLibraryPlace ? (
           <div className="space-y-12">
-            <div className="flex items-center justify-between bg-white/5 p-8 rounded-[2.5rem] border border-white/10">
+            <div className="flex items-center justify-between glass p-8 rounded-[2.5rem]">
               <h2 className="text-3xl font-serif font-bold">Edit Library Place</h2>
               <button 
                 onClick={() => setEditingLibraryPlace(null)}
                 className="px-8 py-4 bg-white/5 hover:bg-white/10 rounded-full text-xs font-black uppercase tracking-widest transition-all"
               >Cancel</button>
             </div>
-            <div className="glass p-10 rounded-[3rem] border border-white/10 grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="glass p-10 rounded-[3rem] grid grid-cols-1 md:grid-cols-2 gap-12">
                <div className="space-y-8">
                   <div className="relative aspect-video rounded-[2rem] overflow-hidden border border-white/10 group">
                     <img src={editingLibraryPlace.image} className="w-full h-full object-cover" alt="" />
@@ -365,7 +365,7 @@ export function SuperAdminContent() {
                   </div>
                 )}
                 {itineraries.map(plan => (
-                  <div key={plan.id} className="bg-white/5 rounded-[2.5rem] border border-white/10 overflow-hidden flex flex-col">
+                  <div key={plan.id} className="glass rounded-[2.5rem] overflow-hidden flex flex-col">
                     <div className="relative group">
                       {/* Expansion Trigger - Now a sibling, not a parent of buttons */}
                       <div 
@@ -453,12 +453,12 @@ export function SuperAdminContent() {
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          className="border-t border-white/5 bg-black/20"
+                          className="border-t border-white/5 bg-black/10"
                         >
                           <div className="p-8 pt-0 space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
                               {plan.days?.map((day: any, dIndex: number) => (
-                                <div key={dIndex} className="bg-white/5 p-5 rounded-2xl border border-white/5 space-y-3">
+                                <div key={dIndex} className="glass p-5 rounded-2xl space-y-3">
                                   <div className="flex items-center justify-between">
                                     <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">Day {dIndex + 1}</span>
                                     <span className="text-[9px] opacity-30 font-bold">{day.events?.length || 0} Events</span>
@@ -497,12 +497,12 @@ export function SuperAdminContent() {
                             <p className="opacity-30 uppercase tracking-widest text-xs font-black">Library is empty. Restore templates or add manually.</p>
                         </div>
                     )}
-                    {masterLibrary.map(place => (
-                        <div 
-                            key={place.id} 
-                            onClick={() => setEditingLibraryPlace(place)}
-                            className="bg-white/5 rounded-[2rem] border border-white/10 p-6 flex gap-6 relative group cursor-pointer hover:bg-white/[0.08] transition-all"
-                        >
+                        {masterLibrary.map(place => (
+                            <div 
+                                key={place.id} 
+                                onClick={() => setEditingLibraryPlace(place)}
+                                className="glass rounded-[2rem] p-6 flex gap-6 relative group cursor-pointer hover:bg-white/[0.04] transition-all"
+                            >
                             <div className="w-24 h-24 rounded-2xl overflow-hidden glass shrink-0">
                                 <img src={place.image} className="w-full h-full object-cover" alt="" />
                             </div>

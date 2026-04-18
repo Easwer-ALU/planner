@@ -81,7 +81,7 @@ export default function BudgetBreakdown({
         </div>
 
         <div className="space-y-8">
-          <div className="p-12 glass rounded-[4rem] bg-emerald-600/[0.03] dark:bg-backwater-blue/[0.05] border border-emerald-600/10 dark:border-white/5 flex flex-col justify-between h-full min-h-[450px] shadow-2xl">
+          <div className="p-12 glass rounded-[4rem] bg-emerald-600/[0.03] dark:bg-backwater-blue/[0.05] flex flex-col justify-between h-full min-h-[450px] shadow-2xl">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 text-[var(--foreground)]">Total Estimate</p>

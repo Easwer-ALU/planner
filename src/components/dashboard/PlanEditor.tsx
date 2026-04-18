@@ -219,7 +219,7 @@ export default function PlanEditor({ plan: initialPlan, masterLibrary = [], onSa
   return (
     <div className="space-y-12 pb-32">
       {/* Editor Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-black/5 dark:bg-white/5 p-6 md:p-8 rounded-[2.5rem] border border-black/10 dark:border-white/10 shadow-inner">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 glass p-6 md:p-8 rounded-[2.5rem] shadow-inner mb-12">
         <div className="space-y-2 w-full max-w-xl">
           <label className="text-[10px] uppercase font-black tracking-widest text-purple-500 ml-4">Plan Name</label>
           <input
@@ -249,14 +249,14 @@ export default function PlanEditor({ plan: initialPlan, masterLibrary = [], onSa
         </div>
 
         {plan.days.length === 0 && (
-          <div className="py-20 text-center border border-white/5 rounded-[2.5rem] bg-white/5">
+          <div className="py-20 text-center glass rounded-[2.5rem]">
             <p className="opacity-40 uppercase tracking-widest text-xs font-black">No days configured.</p>
           </div>
         )}
 
         <div className="space-y-4">
           {plan.days.map((day: any, dIndex: number) => (
-            <div key={day.id ?? dIndex} className="bg-white/5 border border-white/10 rounded-[2rem] overflow-hidden">
+            <div key={day.id ?? dIndex} className="glass rounded-[2rem] overflow-hidden">
               {/* Day Header Trigger */}
               <div 
                 className="flex items-center justify-between p-6 cursor-pointer hover:bg-white/[0.02] transition-colors"
@@ -496,7 +496,7 @@ export default function PlanEditor({ plan: initialPlan, masterLibrary = [], onSa
                     <motion.div 
                         initial={{ scale: 0.9, y: 20 }}
                         animate={{ scale: 1, y: 0 }}
-                        className="bg-[#0B0914] border border-white/10 rounded-[3rem] w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl"
+                        className="glass frost-max rounded-[3rem] w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl"
                     >
                         <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                             <div>
@@ -537,7 +537,7 @@ export default function PlanEditor({ plan: initialPlan, masterLibrary = [], onSa
 
           <div className="grid grid-cols-1 gap-4">
             {(plan.places || []).map((place: any, pIndex: number) => (
-              <div key={place.id || pIndex} className="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col lg:flex-row gap-8 relative group">
+              <div key={place.id || pIndex} className="glass p-6 rounded-[2rem] flex flex-col lg:flex-row gap-8 relative group">
                   <div className="flex items-center justify-between mb-4 lg:hidden">
                      <h4 className="font-bold text-lg text-[var(--foreground)]">{place.name}</h4>
                      <button 

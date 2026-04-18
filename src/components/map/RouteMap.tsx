@@ -455,7 +455,7 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
         <div ref={mapContainer} className="absolute inset-0 w-full h-full touch-none" />
         
         {/* Mobile Header Overlay */}
-        <div className="md:hidden absolute top-0 left-0 right-0 p-8 pt-12 z-20 pointer-events-none bg-gradient-to-b from-[var(--background)] via-[var(--background)]/80 to-transparent">
+        <div className="md:hidden absolute top-0 left-0 right-0 p-8 pt-12 z-20 pointer-events-none bg-gradient-to-b from-[var(--background)] via-[var(--background)] to-transparent">
           <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--foreground)] opacity-40">The Expedition</p>
           <h2 className="text-4xl font-serif font-bold italic tracking-tighter text-[var(--foreground)]">Interactive Trail</h2>
           
@@ -491,7 +491,7 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
                 exit={{ y: 20, opacity: 0 }}
                 className="absolute left-4 right-4 bottom-26 md:left-12 md:bottom-12 md:w-96 z-[60]"
             >
-              <div className="glass frost-max p-5 rounded-[2.5rem] shadow-2xl space-y-5 relative overflow-hidden group">
+              <div className="glass frost-max p-5 rounded-[2.5rem] space-y-5 relative overflow-hidden group">
                 <button onClick={() => setSelectedPlace(null)} className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/10 hover:bg-black/20 transition-colors text-white">
                   <X size={14} />
                 </button>

@@ -16,9 +16,9 @@
     --foreground: #0B1215;     /* Deep Charcoal */
     --primary: #007A33;        /* Lush Palm Green */
     --accent: #FF6F20;         /* Sunset Orange */
-    --card-bg: rgba(255, 255, 255, 0.98);
-    --card-border: rgba(0, 0, 0, 0.04);
-    --card-shadow: 0 20px 50px rgba(0, 0, 0, 0.05); /* Boosted shadow for separation */
+    --card-bg: rgba(255, 255, 255, 0.85); /* Frosted Light */
+    --card-border: rgba(0, 0, 0, 0.06);
+    --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); /* Boosted shadow for separation */
     --footer-bg: #F0EDE4;     /* Misty Sand (Light) */
     --footer-icon: #059669;   /* Emerald 600 */
     --footer-text: #064e3b;   /* Emerald 900 (High contrast) */
@@ -30,9 +30,9 @@
     --foreground: #FCFCF9;
     --primary: #3A8EBA;
     --accent: #FAA61A;
-    --card-bg: rgba(255, 255, 255, 0.03);
-    --card-border: rgba(255, 255, 255, 0.08);
-    --card-shadow: none;
+    --card-bg: rgba(15, 21, 24, 0.8); /* Frosted Dark - not pure white opacity */
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     --footer-bg: #0B1215;     /* Original Deep Charcoal (Dark) */
     --footer-icon: #38bdf8;   /* Sky 400 */
     --footer-text: #ffffff;
@@ -54,8 +54,8 @@
   background-color: var(--card-bg);
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -65,12 +65,12 @@
 }
 
 .frost-max {
-  backdrop-filter: blur(40px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+  backdrop-filter: blur(48px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(48px) saturate(200%) !important;
   transform: translate3d(0,0,0);
   will-change: backdrop-filter, transform;
   transition: all 0.3s ease;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 25px 60px -15px rgba(0, 0, 0, 0.6);
 }
 
 /* Adaptive Performance for Tablet & Mobile */
@@ -121,13 +121,13 @@ button, a {
 
 /* Architect Dot Grid Utility (Optimized for GPU Layering) */
 .bg-dots {
-  background-image: radial-gradient(rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
   background-size: 24px 24px;
   transition: background-image 0.8s ease;
 }
 
 .dark .bg-dots {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1.5px, transparent 1.5px);
 }
 
 @keyframes subtle-zoom {

@@ -249,7 +249,7 @@ export default function Itinerary({ planType = "4-day" }: { planType?: string })
                 }}
                 className={cn(
                   "flex gap-4 md:gap-8 relative group cursor-pointer transition-all duration-700 rounded-[1.5rem] md:rounded-[2rem] p-3 md:p-4 border border-transparent",
-                  activeEventIndex === i ? "bg-black/[0.02] dark:bg-white/[0.03] border-black/[0.02] dark:border-white/5 shadow-inner" : "opacity-40 hover:opacity-100"
+                  activeEventIndex === i ? "glass shadow-xl scale-[1.02] z-20" : "opacity-40 hover:opacity-100"
                 )}
               >
                 {/* Timeline Icon Marker: Centered on line */}
@@ -257,7 +257,7 @@ export default function Itinerary({ planType = "4-day" }: { planType?: string })
                   "w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl flex items-center justify-center shrink-0 z-10 transition-all duration-700 shadow-xl",
                   activeEventIndex === i 
                     ? "bg-emerald-700 text-white dark:bg-backwater-blue scale-110 shadow-emerald-700/30 dark:shadow-backwater-blue/30" 
-                    : "glass bg-black/[0.03] dark:bg-white/5 text-[var(--foreground)] border border-black/[0.03] dark:border-white/10 shadow-lg"
+                    : "glass text-[var(--foreground)]"
                 )}>
                   {(() => {
                     const IconComponent = IconMap[event.icon] || Clock;

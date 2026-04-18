@@ -147,7 +147,7 @@ export default function AdminPanel({ initialSettings, budgetItems, authRole, onE
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-4 px-8 py-4 glass rounded-[2rem] border border-white/10 shadow-2xl backdrop-blur-3xl"
+            className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-4 px-8 py-4 glass rounded-[2rem] shadow-2xl"
           >
             {saveStatus === 'success' ? (
               <CheckCircle2 className="text-green-400" size={24} />
@@ -195,17 +195,17 @@ export default function AdminPanel({ initialSettings, budgetItems, authRole, onE
         </div>
 
         <div className="flex items-center gap-4 md:gap-6">
-          <div className="hidden sm:flex px-6 py-3.5 glass rounded-2xl text-emerald-600 dark:text-emerald-400 items-center gap-3 border border-emerald-600/10 shadow-lg shadow-emerald-600/5">
+          <div className="hidden sm:flex px-6 py-3.5 glass rounded-2xl text-emerald-600 dark:text-emerald-400 items-center gap-3 border-emerald-600/10 shadow-lg shadow-emerald-600/5">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
             <span className="text-[11px] font-black uppercase tracking-[0.2em]">Live Sync Active</span>
           </div>
           <button 
             onClick={onExit} 
-            className="px-6 py-3.5 glass rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black/[0.04] dark:hover:bg-white/10 transition-all border border-black/[0.05] dark:border-white/10 shadow-xl text-[var(--foreground)]"
+            className="px-6 py-3.5 glass rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black/[0.04] dark:hover:bg-white/10 transition-all shadow-xl text-[var(--foreground)]"
           >
             Exit Control
           </button>
-          <button onClick={handleLogout} className="p-4 md:p-5 glass rounded-2xl text-red-500 hover:bg-red-500/10 transition-all border border-black/[0.05] dark:border-white/10 shadow-xl">
+          <button onClick={handleLogout} className="p-4 md:p-5 glass rounded-2xl text-red-500 hover:bg-red-500/10 transition-all shadow-xl">
             <LogOut size={20} />
           </button>
         </div>
