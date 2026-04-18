@@ -31,6 +31,24 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
     document.documentElement.classList.contains("dark") ? "dark" : "light"
   );
 
+  // Sync theme with DOM changes
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          const isDark = document.documentElement.classList.contains('dark');
+          setTheme(isDark ? 'dark' : 'light');
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   // Refs for reactive access in map events (preventing stale closures)
   const placesRef = useRef<Place[]>(places);
   const themeRef = useRef<"light" | "dark">(theme);
@@ -433,7 +451,7 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
         )}
 
       {/* Immersive Map Container */}
-      <div className="relative h-[100dvh] md:h-[750px] w-full md:rounded-[4rem] overflow-hidden md:glass md:border border-white/5 md:shadow-2xl selection:bg-none">
+      <div className="relative h-[100dvh] md:h-[750px] w-full md:rounded-[4rem] overflow-hidden md:border border-black/[0.05] dark:border-white/5 md:shadow-2xl selection:bg-none mb-12 md:mb-20">
         <div ref={mapContainer} className="absolute inset-0 w-full h-full touch-none" />
         
         {/* Mobile Header Overlay */}
@@ -473,7 +491,7 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
                 exit={{ y: 20, opacity: 0 }}
                 className="absolute left-4 right-4 bottom-26 md:left-12 md:bottom-12 md:w-96 z-[60]"
             >
-              <div className="glass p-5 rounded-[2.5rem] border-white/10 shadow-2xl space-y-5 relative overflow-hidden group">
+              <div className="glass frost-max p-5 rounded-[2.5rem] shadow-2xl space-y-5 relative overflow-hidden group">
                 <button onClick={() => setSelectedPlace(null)} className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/10 hover:bg-black/20 transition-colors text-white">
                   <X size={14} />
                 </button>
@@ -526,7 +544,10 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
         <div className={cn("absolute left-0 right-0 bottom-26 md:bottom-8 z-[60] transition-all px-6", (activeMode === "explore" && !selectedPlace) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none")}>
           <div className="flex gap-4 overflow-x-auto no-scrollbar snap-x">
             {places.map((place) => (
-              <button key={place.id} onClick={() => setSelectedPlace(place)} className="flex-shrink-0 snap-center glass p-3.5 rounded-3xl shadow-xl flex items-center gap-3 border-white/10 w-64 md:w-60">
+              <button key={place.id} onClick={() => setSelectedPlace(place)} className={cn(
+                "flex-shrink-0 snap-center p-3.5 rounded-[2rem] shadow-2xl flex items-center gap-3 border transition-all hover:scale-105 active:scale-95 w-64 md:w-60 frost-max",
+                theme === "dark" ? "dark" : "light"
+              )}>
                 <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0"><img src={place.image} className="w-full h-full object-cover" /></div>
                 <div className="text-left overflow-hidden">
                   <p className="text-[7px] font-black uppercase tracking-widest text-emerald-600 mb-0.5">{place.category}</p>

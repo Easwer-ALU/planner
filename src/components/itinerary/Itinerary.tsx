@@ -168,12 +168,12 @@ export default function Itinerary({ planType = "4-day" }: { planType?: string })
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
           transition={{ duration: 0.6, ease: "circOut" }}
-          className="flex flex-col lg:grid lg:grid-cols-2 gap-12 md:gap-16 items-start"
+          className="flex flex-col md:grid md:grid-cols-2 gap-10 md:gap-16 items-start"
         >
           <div 
             ref={carouselRef}
             className={cn(
-              "order-first lg:order-last w-full relative aspect-[16/10] lg:aspect-[4/5] rounded-[2.5rem] lg:rounded-[4rem] overflow-hidden glass group sticky top-4 lg:top-32 shadow-2xl transition-all duration-700 z-20 bg-black isolate",
+              "order-first md:order-last w-full relative aspect-[16/10] md:aspect-[4/5] rounded-[2.5rem] md:rounded-[4rem] overflow-hidden glass group sticky top-4 md:top-32 shadow-2xl transition-all duration-700 z-20 bg-black isolate",
               !isMobile && "hover:transform-none" // Disable all tilt on desktop
             )}
             style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }} // Fix clipping issues on some browsers
@@ -228,7 +228,7 @@ export default function Itinerary({ planType = "4-day" }: { planType?: string })
               </div>
             </div>
 
-            <div className="absolute top-6 right-6 lg:hidden flex items-center gap-2 px-3 py-1.5 glass-dark rounded-full shadow-lg border border-white/10 pointer-events-none">
+            <div className="absolute top-6 right-6 md:hidden flex items-center gap-2 px-3 py-1.5 glass-dark rounded-full shadow-lg border border-white/10 pointer-events-none">
               <span className="text-[8px] font-black uppercase tracking-widest text-white italic">Swipe Snapshot</span>
             </div>
           </div>

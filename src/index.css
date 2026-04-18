@@ -3,6 +3,7 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --dark-mode: selector;
 
   /* Custom Palette based on theme variables */
   --color-palm: var(--primary);
@@ -18,8 +19,12 @@
     --card-bg: rgba(255, 255, 255, 0.98);
     --card-border: rgba(0, 0, 0, 0.04);
     --card-shadow: 0 20px 50px rgba(0, 0, 0, 0.05); /* Boosted shadow for separation */
+    --footer-bg: #F0EDE4;     /* Misty Sand (Light) */
+    --footer-icon: #059669;   /* Emerald 600 */
+    --footer-text: #064e3b;   /* Emerald 900 (High contrast) */
+    --footer-sub: rgba(0, 0, 0, 0.6);
   }
-
+  
   .dark {
     --background: #0B1215;
     --foreground: #FCFCF9;
@@ -28,6 +33,10 @@
     --card-bg: rgba(255, 255, 255, 0.03);
     --card-border: rgba(255, 255, 255, 0.08);
     --card-shadow: none;
+    --footer-bg: #0B1215;     /* Original Deep Charcoal (Dark) */
+    --footer-icon: #38bdf8;   /* Sky 400 */
+    --footer-text: #ffffff;
+    --footer-sub: rgba(255, 255, 255, 0.4);
   }
 
   html, body {
@@ -46,16 +55,52 @@
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);
   backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark .glass {
   backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+}
+
+.frost-max {
+  backdrop-filter: blur(40px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+  transform: translate3d(0,0,0);
+  will-change: backdrop-filter, transform;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Adaptive Performance for Tablet & Mobile */
+@media (max-width: 1024px) {
+  .frost-max {
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  }
+  .glass {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+}
+
+/* Handle both ancestor theme and self-theme classes */
+:is(.light, .light *) .frost-max, .frost-max.light {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+}
+
+:is(.dark, .dark *) .frost-max, .frost-max.dark {
+  background-color: rgba(26, 28, 30, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 .glass-dark {
   background-color: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -72,6 +117,17 @@ button, a {
 /* PWA Transitions */
 .page-transition {
   @apply transition-all duration-700 ease-out;
+}
+
+/* Architect Dot Grid Utility (Optimized for GPU Layering) */
+.bg-dots {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+  transition: background-image 0.8s ease;
+}
+
+.dark .bg-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px);
 }
 
 @keyframes subtle-zoom {

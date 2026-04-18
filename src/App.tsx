@@ -187,34 +187,38 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] transition-colors duration-700 font-sans selection:bg-emerald-600/20">
+    <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] transition-all duration-700 font-sans selection:bg-emerald-600/20 relative">
       
-      {/* Desktop Floating Nav */}
-      <nav className="hidden md:flex fixed top-8 left-1/2 -translate-x-1/2 z-50 glass px-10 py-4 rounded-full items-center gap-10 shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-black/[0.04] dark:border-white/10 transition-all duration-700">
-        <div className="flex items-center gap-3 text-emerald-700 dark:text-backwater-blue mr-6 group cursor-pointer" onClick={() => setActiveTab("overview")}>
+      {/* Hardware Accelerated Background Layer */}
+      <div className="fixed inset-0 pointer-events-none z-0 bg-dots opacity-100 transition-opacity duration-1000" aria-hidden="true" />
+      
+      <div className="relative z-10 flex flex-col min-h-screen">
+        {/* Desktop Floating Nav */}
+        <nav className="hidden md:flex fixed top-4 lg:top-8 left-1/2 -translate-x-1/2 z-50 glass px-10 lg:px-12 py-4 lg:py-5 rounded-full items-center gap-8 lg:gap-10 shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-black/[0.04] dark:border-white/10 transition-all duration-700 max-w-[92vw] overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-3 text-emerald-700 dark:text-backwater-blue mr-6 group cursor-pointer shrink-0" onClick={() => setActiveTab("overview")}>
           <Palmtree size={24} className="group-hover:rotate-12 transition-transform duration-500" />
           <span className="font-serif font-bold text-3xl tracking-tighter">KL26</span>
         </div>
-        <button onClick={() => setActiveTab("overview")} className={cn("text-[11px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100", activeTab === "overview" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Overview</button>
-        <button onClick={() => setActiveTab("itinerary")} className={cn("text-[11px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100", activeTab === "itinerary" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Itinerary</button>
-        <button onClick={() => setActiveTab("map")} className={cn("text-[11px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100", activeTab === "map" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Map</button>
-        <button onClick={() => setActiveTab("ledger")} className={cn("text-[11px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100", activeTab === "ledger" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Ledger</button>
-        <button onClick={() => setActiveTab("weather")} className={cn("text-[11px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100", activeTab === "weather" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Weather</button>
+        <button onClick={() => setActiveTab("overview")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 shrink-0", activeTab === "overview" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Overview</button>
+        <button onClick={() => setActiveTab("itinerary")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 shrink-0", activeTab === "itinerary" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Itinerary</button>
+        <button onClick={() => setActiveTab("map")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 shrink-0", activeTab === "map" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Map</button>
+        <button onClick={() => setActiveTab("ledger")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 shrink-0", activeTab === "ledger" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Ledger</button>
+        <button onClick={() => setActiveTab("weather")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 shrink-0", activeTab === "weather" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Weather</button>
         
         {authRole !== 'none' && (
-          <button onClick={() => setActiveTab("admin")} className={cn("text-[11px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 text-purple-600 dark:text-purple-400", activeTab === "admin" ? "opacity-100 scale-110" : "opacity-30")}>Settings</button>
+          <button onClick={() => setActiveTab("admin")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 text-purple-600 dark:text-purple-400 shrink-0", activeTab === "admin" ? "opacity-100 scale-110" : "opacity-30")}>Settings</button>
         )}
 
         
-        <div className="w-[1px] h-6 bg-[var(--foreground)] opacity-10 mx-4" />
+        <div className="w-[1px] h-6 bg-[var(--foreground)] opacity-10 mx-1 lg:mx-4" />
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 lg:gap-4">
           <button 
             onClick={() => setIsDark(!isDark)} 
-            className="p-3.5 rounded-full hover:bg-black/[0.04] dark:hover:bg-white/10 transition-all duration-500 text-[var(--foreground)] hover:scale-110"
+            className="p-2 lg:p-3.5 rounded-full hover:bg-black/[0.04] dark:hover:bg-white/10 transition-all duration-500 text-[var(--foreground)] hover:scale-110"
             title="Toggle Theme"
           >
-            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+            {isDark ? <Sun size={20} className="w-4 h-4 lg:w-5 lg:h-5" /> : <Moon size={20} className="w-4 h-4 lg:w-5 lg:h-5" />}
           </button>
         </div>
       </nav>
@@ -318,6 +322,7 @@ export default function App() {
           </motion.nav>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 }
