@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Receipt, TrendingUp, TrendingDown, ArrowRightLeft, IndianRupee, Info, CheckCircle2 } from "lucide-react";
+import { Plus, Receipt, TrendingUp, TrendingDown, ArrowRightLeft, IndianRupee, Info, CheckCircle2, Trash2, History, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Member, Expense, Settlement } from "@/lib/types";
 import MemberAvatar from "./MemberAvatar";
@@ -16,6 +16,9 @@ export default function SharedLedger({ members, expenses }: SharedLedgerProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeView, setActiveView] = useState<'expenses' | 'settlements'>('expenses');
   const [expandedMember, setExpandedMember] = useState<string | null>(null);
+  const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
+  const [lastDeleted, setLastDeleted] = useState<{data: any, id: string} | null>(null);
+  const [showToast, setShowToast] = useState(false);
 
   // Logic to calculate balances
   const balances = useMemo(() => {
@@ -111,16 +114,49 @@ export default function SharedLedger({ members, expenses }: SharedLedgerProps) {
     }
   };
 
-  const handleUndoSettlement = async (expenseId: string) => {
+  const handleDeleteExpense = async (expenseId: string) => {
     try {
+      const expenseToSide = expenses.find(e => e.id === expenseId);
+      if (!expenseToSide) return;
+
+      // Take snapshot before deletion
+      const { id, ...data } = expenseToSide;
+      setLastDeleted({ data, id });
+      
       await deleteDoc(doc(db, "trip_settings", "main", "actual_expenses", expenseId));
+      
+      // Trigger Toast
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 5000);
+    } catch (error) {
+      console.error("Deletion failed", error);
+    }
+  };
+
+  const handleUndo = async () => {
+    if (!lastDeleted) return;
+    try {
+      await addDoc(collection(db, "trip_settings", "main", "actual_expenses"), {
+        ...lastDeleted.data,
+        date: serverTimestamp() // Refresh timestamp to move to top
+      });
+      setShowToast(false);
+      setLastDeleted(null);
     } catch (error) {
       console.error("Undo failed", error);
     }
   };
 
-  const recentSettlements = useMemo(() => {
-    return expenses.filter(e => e.isSettlement).slice(0, 5);
+  const recentExpenses = useMemo(() => {
+    return expenses.filter(e => !e.isSettlement);
+  }, [expenses]);
+
+  const settlementHistory = useMemo(() => {
+    return expenses.filter(e => e.isSettlement).sort((a, b) => {
+      const dateA = a.date?.toDate ? a.date.toDate() : new Date();
+      const dateB = b.date?.toDate ? b.date.toDate() : new Date();
+      return dateB.getTime() - dateA.getTime();
+    });
   }, [expenses]);
 
   return (
@@ -222,38 +258,40 @@ export default function SharedLedger({ members, expenses }: SharedLedgerProps) {
                   exit={{ opacity: 0, x: 20 }}
                   className="space-y-4"
                 >
-                  {expenses.length === 0 ? (
+                  {recentExpenses.length === 0 ? (
                     <div className="glass p-20 rounded-[3rem] text-center border-dashed border-white/5">
                        <p className="text-xs font-black uppercase tracking-widest opacity-20">No expenses logged yet</p>
                     </div>
                   ) : (
-                    expenses.map(exp => {
+                    recentExpenses.map(exp => {
                       const payer = members.find(m => m.id === exp.paidBy);
                       return (
-                        <div key={exp.id} className={cn(
-                          "glass p-6 md:p-8 rounded-[2.5rem] flex items-center justify-between group hover:bg-white/[0.02] transition-all border border-transparent hover:border-white/5",
-                          exp.isSettlement && "bg-emerald-500/[0.03] border-emerald-500/10"
-                        )}>
+                        <div key={exp.id} className="glass p-6 md:p-8 rounded-[2.5rem] flex items-center justify-between group hover:bg-white/[0.02] transition-all border border-transparent hover:border-white/5">
                           <div className="flex items-center gap-6">
-                            <MemberAvatar member={payer} size="md" className={exp.isSettlement ? "shadow-emerald-500/20" : ""} />
+                            <MemberAvatar member={payer} size="md" />
                             <div className="space-y-1">
                               <p className="text-sm font-bold text-[var(--foreground)]">{exp.description}</p>
                               <p className="text-[10px] font-black uppercase tracking-widest opacity-30">
-                                {exp.isSettlement ? "Settlement" : `${payer?.name} paid ₹${exp.amount.toLocaleString()}`}
+                                {payer?.name} paid ₹{exp.amount.toLocaleString()}
                               </p>
                             </div>
                           </div>
                           
-                          <div className="text-right space-y-1">
-                             <p className={cn(
-                               "text-xl font-serif font-bold",
-                               exp.isSettlement ? "text-emerald-600" : "text-[var(--foreground)]"
-                             )}>
-                               ₹{exp.amount.toLocaleString()}
-                             </p>
-                             <p className="text-[9px] font-black uppercase tracking-widest opacity-20">
-                               {exp.date?.toDate ? exp.date.toDate().toLocaleDateString() : 'Syncing...'}
-                             </p>
+                          <div className="flex items-center gap-6">
+                            <div className="text-right space-y-1">
+                               <p className="text-xl font-serif font-bold text-[var(--foreground)]">
+                                 ₹{exp.amount.toLocaleString()}
+                               </p>
+                               <p className="text-[9px] font-black uppercase tracking-widest opacity-20">
+                                 {exp.date?.toDate ? exp.date.toDate().toLocaleDateString() : 'Syncing...'}
+                               </p>
+                            </div>
+                            <button 
+                              onClick={() => handleDeleteExpense(exp.id)}
+                              className="p-3 text-red-500/40 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all opacity-40 group-hover:opacity-100"
+                            >
+                              <Trash2 size={18} />
+                            </button>
                           </div>
                         </div>
                       )
@@ -266,16 +304,16 @@ export default function SharedLedger({ members, expenses }: SharedLedgerProps) {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="space-y-12"
+                  className="space-y-16"
                 >
-                  {settlements.length === 0 ? (
-                    <div className="glass p-20 rounded-[3rem] text-center border-emerald-500/20 bg-emerald-500/5">
-                       <CheckCircle2 size={48} className="text-emerald-600 mx-auto mb-6" />
-                       <h3 className="text-2xl font-serif font-bold text-emerald-600 mb-2">Perfectly Balanced</h3>
-                       <p className="text-xs font-black uppercase tracking-widest opacity-40">All debts have been cleared</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-12">
+                  <div className="space-y-12">
+                    {settlements.length === 0 ? (
+                      <div className="glass p-20 rounded-[3rem] text-center border-emerald-500/20 bg-emerald-500/5">
+                         <CheckCircle2 size={48} className="text-emerald-600 mx-auto mb-6" />
+                         <h3 className="text-2xl font-serif font-bold text-emerald-600 mb-2">Perfectly Balanced</h3>
+                         <p className="text-xs font-black uppercase tracking-widest opacity-40">All debts have been cleared</p>
+                      </div>
+                    ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {members.filter(m => Math.abs(balances[m.id]) > 0.01).map(m => {
                           const bal = balances[m.id];
@@ -373,34 +411,74 @@ export default function SharedLedger({ members, expenses }: SharedLedgerProps) {
                           );
                         })}
                       </div>
+                    )}
+                  </div>
 
-                      {/* Recent Settlements (The Undo Zone) */}
-                      {recentSettlements.length > 0 && (
-                        <div className="space-y-6 pt-8 border-t border-white/5">
-                          <h5 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 px-4">Recently Settled</h5>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-60 hover:opacity-100 transition-opacity">
-                            {recentSettlements.map(exp => (
-                              <div key={exp.id} className="glass p-4 rounded-2xl flex items-center justify-between border-emerald-500/10">
-                                <div className="flex items-center gap-3">
+                  {/* Settlement History (Persistent Section) */}
+                  <div className="space-y-4 pt-12 border-t border-white/5">
+                    <button 
+                      onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
+                      className="w-full glass p-6 rounded-2xl flex items-center justify-between border-white/5 hover:bg-white/[0.02] transition-all text-left group"
+                    >
+                       <div className="flex items-center gap-4">
+                          <div className={cn(
+                            "p-2 rounded-lg transition-colors",
+                            isHistoryExpanded ? "bg-emerald-600 text-white" : "bg-emerald-500/10 text-emerald-500"
+                          )}>
+                            <History size={16} />
+                          </div>
+                          <div>
+                            <h5 className="text-[10px] font-black uppercase tracking-widest">Settlement History</h5>
+                            <p className="text-[9px] opacity-30 uppercase font-black">{settlementHistory.length} Past Records</p>
+                          </div>
+                       </div>
+                       <motion.div
+                          animate={{ rotate: isHistoryExpanded ? 180 : 0 }}
+                          className="opacity-20 group-hover:opacity-100 transition-opacity"
+                       >
+                          <ChevronDown size={20} />
+                       </motion.div>
+                    </button>
+
+                    <AnimatePresence>
+                      {isHistoryExpanded && (
+                        <motion.div 
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden space-y-3"
+                        >
+                          {settlementHistory.length === 0 ? (
+                            <div className="p-12 text-center opacity-20">
+                               <p className="text-[10px] uppercase font-black tracking-widest">No past settlements recorded</p>
+                            </div>
+                          ) : (
+                            settlementHistory.map(exp => (
+                              <div key={exp.id} className="glass p-5 rounded-2xl flex items-center justify-between border-emerald-500/10 group">
+                                <div className="flex items-center gap-4">
                                   <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                                     <CheckCircle2 size={14} />
                                   </div>
                                   <div className="space-y-0.5">
-                                    <p className="text-[10px] font-bold line-clamp-1">{exp.description}</p>
-                                    <p className="text-[8px] font-black uppercase opacity-30">₹{exp.amount.toLocaleString()}</p>
+                                    <p className="text-xs font-bold line-clamp-1">{exp.description}</p>
+                                    <p className="text-[9px] font-black uppercase opacity-30">
+                                      ₹{exp.amount.toLocaleString()} • {exp.date?.toDate ? exp.date.toDate().toLocaleDateString() : 'Syncing...'}
+                                    </p>
                                   </div>
                                 </div>
                                 <button 
-                                  onClick={() => handleUndoSettlement(exp.id)}
-                                  className="px-3 py-1 bg-white/5 hover:bg-red-500/10 hover:text-red-400 rounded-md text-[8px] font-black uppercase tracking-widest transition-all"
-                                >Undo</button>
+                                  onClick={() => handleDeleteExpense(exp.id)}
+                                  className="p-2 text-red-500/40 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all opacity-40 group-hover:opacity-100"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
                               </div>
-                            ))}
-                          </div>
-                        </div>
+                            ))
+                          )}
+                        </motion.div>
                       )}
-                    </div>
-                  )}
+                    </AnimatePresence>
+                  </div>
                 </motion.div>
              )}
            </AnimatePresence>
@@ -451,6 +529,36 @@ export default function SharedLedger({ members, expenses }: SharedLedgerProps) {
            </div>
         </div>
       </div>
+
+      {/* Undo Toast */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div 
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] w-[90vw] max-w-md"
+          >
+            <div className="glass p-4 rounded-2xl border-white/10 shadow-2xl bg-zinc-900/90 flex items-center justify-between gap-4 backdrop-blur-xl">
+               <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500">
+                    <Trash2 size={14} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest">Record Deleted</p>
+                    <p className="text-[9px] opacity-40 uppercase font-black truncate max-w-[150px]">
+                      {lastDeleted?.data?.description}
+                    </p>
+                  </div>
+               </div>
+               <button 
+                onClick={handleUndo}
+                className="px-6 py-2 bg-white text-black rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all active:scale-95"
+               >Undo Action</button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AddExpenseModal 
         isOpen={isModalOpen} 
