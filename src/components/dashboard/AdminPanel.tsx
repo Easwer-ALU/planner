@@ -22,6 +22,7 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [adminViewMode, setAdminViewMode] = useState<'dashboard' | 'architect'>('dashboard');
+  const [isMembersExpanded, setIsMembersExpanded] = useState(false);
 
 
   useEffect(() => {
@@ -362,44 +363,70 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
 
           {/* Group Member Management */}
           <div className="space-y-12">
+            {/* Members List Header (now a toggle on mobile) */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
-              <div className="flex items-center gap-6">
-                <div className="p-4 glass rounded-2xl shadow-xl text-blue-500">
-                  <UserPlus size={32} />
+              <button 
+                onClick={() => setIsMembersExpanded(!isMembersExpanded)}
+                className="flex items-center gap-6 text-left group"
+              >
+                <div className={cn(
+                  "p-4 glass rounded-2xl shadow-xl transition-all",
+                  isMembersExpanded ? "bg-blue-600 text-white" : "text-blue-600 dark:text-blue-400"
+                )}>
+                  <Users size={32} />
                 </div>
                 <div className="space-y-1">
-                  <h2 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-[var(--foreground)]">Trip Participants</h2>
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-[var(--foreground)]">Trip Participants</h2>
+                    <motion.div
+                      animate={{ rotate: isMembersExpanded ? 180 : 0 }}
+                      className="md:hidden opacity-30"
+                    >
+                      <ChevronDown size={24} />
+                    </motion.div>
+                  </div>
                   <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400">
-                    Managing {members.length} explorers
+                    {members.length} {members.length === 1 ? 'Explorer' : 'Explorers'} • {isMembersExpanded ? 'Tap to hide' : 'Tap to manage'}
                   </p>
                 </div>
-              </div>
+              </button>
               <button 
                 onClick={addMember} 
                 className="flex items-center gap-2 px-8 py-3.5 glass rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-black/[0.04] dark:hover:bg-white/10 transition-all border border-black/[0.03] dark:border-white/10 shadow-xl text-[var(--foreground)]"
               >
-                <Plus size={16} className="text-blue-600 dark:text-blue-400" /> Add Member
+                <UserPlus size={16} className="text-blue-600 dark:text-blue-400" /> Add Member
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <AnimatePresence mode="popLayout">
-                {members.map((member) => (
-                  <MemberCard 
-                    key={member.id} 
-                    member={member} 
-                    onUpdate={updateMemberField} 
-                    onRemove={removeMember}
-                    onNotify={showNotify}
-                  />
-                ))}
-              </AnimatePresence>
-              {members.length === 0 && (
-                <div className="col-span-full py-12 text-center opacity-20 border-2 border-dashed border-white/10 rounded-[2rem]">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em]">Assign explorers to track their shares</p>
-                </div>
+            <AnimatePresence>
+              {(isMembersExpanded || window.innerWidth > 768) && (
+                <motion.div 
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
+                    <AnimatePresence mode="popLayout">
+                      {members.map((member) => (
+                        <MemberCard 
+                          key={member.id} 
+                          member={member} 
+                          onUpdate={updateMemberField} 
+                          onRemove={removeMember}
+                          onNotify={showNotify}
+                        />
+                      ))}
+                    </AnimatePresence>
+                    {members.length === 0 && (
+                      <div className="col-span-full py-12 text-center opacity-20 border-2 border-dashed border-white/10 rounded-[2rem]">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em]">Assign explorers to track their shares</p>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
               )}
-            </div>
+            </AnimatePresence>
           </div>
 
           <div className="space-y-12">
@@ -502,7 +529,14 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
   );
 }
 
-function MemberCard({ member, onUpdate, onRemove, onNotify }: { member: any, onUpdate: any, onRemove: any, onNotify: any }) {
+interface MemberCardProps {
+  member: any;
+  onUpdate: (id: string, field: string, value: string) => Promise<boolean>;
+  onRemove: (id: string) => Promise<void>;
+  onNotify: (status: 'success' | 'error') => void;
+}
+
+const MemberCard: React.FC<MemberCardProps> = ({ member, onUpdate, onRemove, onNotify }) => {
   const [name, setName] = useState(member.name);
   const [initials, setInitials] = useState(member.initials || "");
 
