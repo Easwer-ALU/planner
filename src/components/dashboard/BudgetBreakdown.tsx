@@ -47,8 +47,8 @@ export default function BudgetBreakdown({
   return (
     <div className="space-y-16">
       <div className="space-y-3 text-center md:text-left">
-        <p className="text-xs font-black uppercase tracking-[0.4em] opacity-40 text-[var(--foreground)]">Financial Ledger</p>
-        <h2 className="text-5xl md:text-6xl font-serif font-bold italic tracking-tighter text-[var(--foreground)]">Expedition Budget</h2>
+        <p className="text-xs font-black uppercase tracking-[0.4em] opacity-40 text-[var(--foreground)]">Expedition Projections</p>
+        <h2 className="text-5xl md:text-6xl font-serif font-bold italic tracking-tighter text-[var(--foreground)]">Trip Projections</h2>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">

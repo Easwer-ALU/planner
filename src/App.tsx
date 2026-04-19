@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sun, Moon, Home, Map, Receipt, Palmtree, CloudRain, Compass, Settings, ShieldCheck } from "lucide-react";
+import { Sun, Moon, Home, Map, Receipt, Palmtree, CloudRain, Compass, Settings, ShieldCheck, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Hero from "@/components/Hero";
 import BentoGrid from "@/components/dashboard/BentoGrid";
 import Itinerary from "@/components/itinerary/Itinerary";
 import BudgetBreakdown from "@/components/dashboard/BudgetBreakdown";
+import SharedLedger from "@/components/dashboard/SharedLedger";
 import RouteMap from "@/components/map/RouteMap";
 import WeatherOverview from "@/components/dashboard/WeatherOverview";
 import Footer from "@/components/Footer";
 import AdminPanel from "@/components/dashboard/AdminPanel";
-import SuperAdminPanel from "@/components/dashboard/SuperAdminPanel";
 import AuthPortal from "@/components/dashboard/AuthPortal";
 import { 
   db, 
@@ -33,6 +33,16 @@ import {
 export default function App() {
   const [isDark, setIsDark] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (navRef.current) {
+      const activeBtn = navRef.current.querySelector('[data-active="true"]');
+      if (activeBtn) {
+        activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    }
+  }, [activeTab]);
 
   // Reset scroll on tab change to prevent map/itinerary stickiness
   useEffect(() => {
@@ -65,6 +75,8 @@ export default function App() {
   const [showAuthPortal, setShowAuthPortal] = useState(false);
   const [settings, setSettings] = useState<any>(null);
   const [budgetItems, setBudgetItems] = useState<any[]>([]);
+  const [members, setMembers] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -154,9 +166,31 @@ export default function App() {
       handleFirestoreError(error, OperationType.LIST, "trip_settings/main/budget_items");
     });
 
+    // Subcollection listener for members
+    const membersCollection = collection(db, "trip_settings", "main", "members");
+    const membersQuery = query(membersCollection, orderBy("createdAt", "asc"));
+    const unsubscribeMembers = onSnapshot(membersQuery, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setMembers(items);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, "trip_settings/main/members");
+    });
+
+    // Subcollection listener for actual expenses
+    const expensesCollection = collection(db, "trip_settings", "main", "actual_expenses");
+    const expensesQuery = query(expensesCollection, orderBy("date", "desc"));
+    const unsubscribeExpenses = onSnapshot(expensesQuery, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setExpenses(items);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, "trip_settings/main/actual_expenses");
+    });
+
     return () => {
       unsubscribeSettings();
       unsubscribeBudget();
+      unsubscribeMembers();
+      unsubscribeExpenses();
     };
   }, [isAuthReady]);
 
@@ -202,7 +236,8 @@ export default function App() {
         <button onClick={() => setActiveTab("overview")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 shrink-0", activeTab === "overview" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Overview</button>
         <button onClick={() => setActiveTab("itinerary")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 shrink-0", activeTab === "itinerary" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Itinerary</button>
         <button onClick={() => setActiveTab("map")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 shrink-0", activeTab === "map" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Map</button>
-        <button onClick={() => setActiveTab("ledger")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 shrink-0", activeTab === "ledger" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Ledger</button>
+        <button onClick={() => setActiveTab("ledger")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 shrink-0", activeTab === "ledger" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Estimates</button>
+        <button onClick={() => setActiveTab("wallet")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 shrink-0", activeTab === "wallet" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Wallet</button>
         <button onClick={() => setActiveTab("weather")} className={cn("text-[11px] lg:text-[13px] font-black uppercase tracking-[0.3em] transition-all hover:opacity-100 shrink-0", activeTab === "weather" ? "text-emerald-700 dark:text-backwater-blue opacity-100 scale-110" : "opacity-30")}>Weather</button>
         
         {authRole !== 'none' && (
@@ -250,13 +285,14 @@ export default function App() {
               <>
                 <Hero planType={activePlan} groupSize={groupSize} activeBudgetTotal={calculatedTotal} dayCount={itineraryDays} />
                 <div className="px-6 md:px-12 max-w-7xl mx-auto w-full">
-                  <BentoGrid activeBudgetTotal={calculatedTotal} groupSize={groupSize} setActiveTab={setActiveTab} />
+                  <BentoGrid activeBudgetTotal={calculatedTotal} groupSize={groupSize} members={members} setActiveTab={setActiveTab} />
                 </div>
               </>
             )}
             {activeTab === "itinerary" && <Itinerary planType={activePlan} />}
             {activeTab === "map" && <RouteMap activePlanId={activePlan} />}
             {activeTab === "ledger" && settings.show_budget && <BudgetBreakdown planType={activePlan} customBudget={activeBudget} groupSize={groupSize} />}
+            {activeTab === "wallet" && <SharedLedger members={members} expenses={expenses} />}
             {activeTab === "weather" && (
               <div className="max-w-5xl mx-auto">
                 <WeatherOverview variant="full" />
@@ -266,6 +302,7 @@ export default function App() {
               <AdminPanel 
                 initialSettings={settings} 
                 budgetItems={budgetItems} 
+                members={members}
                 authRole={authRole}
                 onExit={() => setActiveTab("overview")} 
               />
@@ -280,43 +317,75 @@ export default function App() {
       <AnimatePresence>
         {(activeTab !== "overview" || scrolled) && (
           <motion.nav 
+            ref={navRef}
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="md:hidden fixed bottom-4 left-4 right-4 z-50 glass px-6 py-4 rounded-[2.5rem] flex items-center justify-around shadow-[0_30px_60px_rgba(0,0,0,0.2)] border-black/[0.04] dark:border-white/10"
+            className="md:hidden fixed bottom-4 left-4 right-4 z-50 glass py-3 rounded-[2.5rem] flex items-center gap-7 overflow-x-auto no-scrollbar px-8 shadow-[0_30px_60px_rgba(0,0,0,0.2)] border-black/[0.04] dark:border-white/10 scroll-smooth scroll-snap-x-mandatory"
           >
-            <button onClick={() => setActiveTab("overview")} className={cn("flex flex-col items-center gap-1.5 transition-all duration-500", activeTab === "overview" ? "text-emerald-700 dark:text-backwater-blue scale-110" : "opacity-30")}>
-              <Home size={20} />
-              <span className="text-[8px] font-black uppercase tracking-widest">Home</span>
+            <button 
+              data-active={activeTab === "overview"}
+              onClick={() => setActiveTab("overview")} 
+              className={cn("flex flex-col items-center gap-1 transition-all duration-500 shrink-0 scroll-snap-align-center", activeTab === "overview" ? "text-emerald-700 dark:text-backwater-blue scale-110" : "opacity-30")}
+            >
+              <Home size={18} />
+              <span className="text-[9px] font-black uppercase tracking-widest">Overview</span>
             </button>
-            <button onClick={() => setActiveTab("itinerary")} className={cn("flex flex-col items-center gap-1.5 transition-all duration-500", activeTab === "itinerary" ? "text-emerald-700 dark:text-backwater-blue scale-110" : "opacity-30")}>
-              <Map size={20} />
-              <span className="text-[8px] font-black uppercase tracking-widest">Trail</span>
+            <button 
+              data-active={activeTab === "itinerary"}
+              onClick={() => setActiveTab("itinerary")} 
+              className={cn("flex flex-col items-center gap-1 transition-all duration-500 shrink-0 scroll-snap-align-center", activeTab === "itinerary" ? "text-emerald-700 dark:text-backwater-blue scale-110" : "opacity-30")}
+            >
+              <Palmtree size={18} />
+              <span className="text-[9px] font-black uppercase tracking-widest">Itinerary</span>
             </button>
-            <button onClick={() => setActiveTab("map")} className={cn("flex flex-col items-center gap-1.5 transition-all duration-500", activeTab === "map" ? "text-emerald-700 dark:text-backwater-blue scale-110" : "opacity-30")}>
-              <Compass size={20} />
-              <span className="text-[8px] font-black uppercase tracking-widest">Map</span>
+            <button 
+              data-active={activeTab === "map"}
+              onClick={() => setActiveTab("map")} 
+              className={cn("flex flex-col items-center gap-1 transition-all duration-500 shrink-0 scroll-snap-align-center", activeTab === "map" ? "text-emerald-700 dark:text-backwater-blue scale-110" : "opacity-30")}
+            >
+              <Map size={18} />
+              <span className="text-[9px] font-black uppercase tracking-widest">Map</span>
             </button>
-            <button onClick={() => setActiveTab("ledger")} className={cn("flex flex-col items-center gap-1.5 transition-all duration-500", activeTab === "ledger" ? "text-emerald-700 dark:text-backwater-blue scale-110" : "opacity-30")}>
-              <Receipt size={20} />
-              <span className="text-[8px] font-black uppercase tracking-widest">Ledger</span>
+            <button 
+              data-active={activeTab === "ledger"}
+              onClick={() => setActiveTab("ledger")} 
+              className={cn("flex flex-col items-center gap-1 transition-all duration-500 shrink-0 scroll-snap-align-center", activeTab === "ledger" ? "text-emerald-700 dark:text-backwater-blue scale-110" : "opacity-30")}
+            >
+              <Receipt size={18} />
+              <span className="text-[9px] font-black uppercase tracking-widest">Estimates</span>
             </button>
-            <button onClick={() => setActiveTab("weather")} className={cn("flex flex-col items-center gap-1.5 transition-all duration-500", activeTab === "weather" ? "text-emerald-700 dark:text-backwater-blue scale-110" : "opacity-30")}>
-              <CloudRain size={20} />
-              <span className="text-[8px] font-black uppercase tracking-widest">Sky</span>
+            <button 
+              data-active={activeTab === "wallet"}
+              onClick={() => setActiveTab("wallet")} 
+              className={cn("flex flex-col items-center gap-1 transition-all duration-500 shrink-0 scroll-snap-align-center", activeTab === "wallet" ? "text-emerald-700 dark:text-backwater-blue scale-110" : "opacity-30")}
+            >
+              <Wallet size={18} />
+              <span className="text-[9px] font-black uppercase tracking-widest">Wallet</span>
+            </button>
+            <button 
+              data-active={activeTab === "weather"}
+              onClick={() => setActiveTab("weather")} 
+              className={cn("flex flex-col items-center gap-1 transition-all duration-500 shrink-0 scroll-snap-align-center", activeTab === "weather" ? "text-emerald-700 dark:text-backwater-blue scale-110" : "opacity-30")}
+            >
+              <CloudRain size={18} />
+              <span className="text-[9px] font-black uppercase tracking-widest">Weather</span>
             </button>
             
             {authRole !== 'none' && (
-              <button onClick={() => setActiveTab("admin")} className={cn("flex flex-col items-center gap-1.5 transition-all duration-500", activeTab === "admin" ? "text-purple-600 dark:text-purple-400 scale-110" : "opacity-30")}>
-                <Settings size={20} />
-                <span className="text-[8px] font-black uppercase tracking-widest">Settings</span>
+              <button 
+                data-active={activeTab === "admin"}
+                onClick={() => setActiveTab("admin")} 
+                className={cn("flex flex-col items-center gap-1 transition-all duration-500 shrink-0 scroll-snap-align-center", activeTab === "admin" ? "text-purple-600 dark:text-purple-400 scale-110" : "opacity-30")}
+              >
+                <Settings size={18} />
+                <span className="text-[9px] font-black uppercase tracking-widest">Settings</span>
               </button>
             )}
 
+            <div className="w-[1px] h-6 bg-[var(--foreground)] opacity-10 shrink-0" />
             
-            <div className="w-[1px] h-6 bg-[var(--foreground)] opacity-10" />
-            
-            <button onClick={() => setIsDark(!isDark)} className="flex items-center justify-center p-2 rounded-full bg-black/5 dark:bg-white/10 opacity-60">
+            <button onClick={() => setIsDark(!isDark)} className="flex items-center justify-center p-2 rounded-full bg-black/5 dark:bg-white/10 opacity-60 shrink-0">
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
           </motion.nav>

@@ -7,10 +7,11 @@ import { cn } from "@/lib/utils";
 interface BentoGridProps {
   activeBudgetTotal?: number;
   groupSize?: number;
+  members: any[];
   setActiveTab: (tab: string) => void;
 }
 
-export default function BentoGrid({ activeBudgetTotal = 15500, groupSize = 8, setActiveTab }: BentoGridProps) {
+export default function BentoGrid({ activeBudgetTotal = 15500, groupSize = 8, members = [], setActiveTab }: BentoGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-3 gap-4">
       {/* Main Hero Card */}
@@ -42,28 +43,34 @@ export default function BentoGrid({ activeBudgetTotal = 15500, groupSize = 8, se
         <CountdownCard />
       </motion.div>
 
-      {/* Group Bento */}
       <motion.div
         whileHover={{ scale: 1.02 }}
-        className="glass rounded-[2.5rem] p-10 flex flex-col justify-between relative overflow-hidden group"
+        onClick={() => setActiveTab('wallet')}
+        className="glass rounded-[2.5rem] p-10 flex flex-col justify-between relative overflow-hidden group cursor-pointer"
       >
         <div className="flex items-center justify-between">
           <Users className="text-[var(--primary)]" size={24} />
           <span className="text-[10px] font-black uppercase tracking-widest opacity-40 text-[var(--foreground)]">Group</span>
         </div>
         <div className="relative">
-          <p className="text-4xl md:text-5xl font-serif font-bold italic text-[var(--foreground)]">{groupSize}</p>
+          <p className="text-4xl md:text-5xl font-serif font-bold italic text-[var(--foreground)]">{members.length || groupSize}</p>
           <p className="text-[10px] md:text-[11px] font-bold opacity-40 uppercase tracking-widest text-[var(--foreground)] mt-1">Explorers</p>
         </div>
         <div className="flex -space-x-2 mt-4 text-[var(--foreground)]">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="w-8 h-8 rounded-full border-2 border-[var(--background)] bg-black/5 dark:bg-white/10 flex items-center justify-center text-[10px] font-bold">
-              {String.fromCharCode(65 + i)}
+          {members.slice(0, 4).map((m, i) => (
+            <div 
+              key={m.id || i} 
+              className="w-8 h-8 rounded-full border-2 border-[var(--background)] flex items-center justify-center text-[8px] font-black text-white shadow-sm"
+              style={{ backgroundColor: m.color || "#ccc" }}
+            >
+              {m.initials || m.name?.split(' ').filter(Boolean).map((n: string) => n[0]).join('').toUpperCase().substring(0, 3)}
             </div>
           ))}
-          <div className="w-8 h-8 rounded-full border-2 border-[var(--background)] bg-[var(--primary)]/10 flex items-center justify-center text-[10px] font-bold text-[var(--primary)]">
-            +{groupSize - 4}
-          </div>
+          {members.length > 4 && (
+            <div className="w-8 h-8 rounded-full border-2 border-[var(--background)] bg-[var(--primary)]/10 flex items-center justify-center text-[10px] font-bold text-[var(--primary)] backdrop-blur-sm">
+              +{members.length - 4}
+            </div>
+          )}
         </div>
         <div className="absolute -right-6 -bottom-6 opacity-[0.05] dark:opacity-10 pointer-events-none rotate-12 group-hover:rotate-0 transition-transform duration-1000">
           <Palmtree size={220} className="text-[var(--primary)]" />

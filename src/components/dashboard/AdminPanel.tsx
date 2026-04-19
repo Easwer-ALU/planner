@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Eye, EyeOff, Calendar, Receipt, Plus, Trash2, Users, LogOut, CheckCircle2, AlertCircle, X, ChevronDown, Hammer, LayoutGrid } from "lucide-react";
+import { Eye, EyeOff, Calendar, Receipt, Plus, Trash2, Users, LogOut, CheckCircle2, AlertCircle, X, ChevronDown, Hammer, LayoutGrid, UserPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { db, OperationType, handleFirestoreError, doc, setDoc, collection, addDoc, deleteDoc, updateDoc, serverTimestamp, getDocs, query, where } from "@/lib/firebase";
@@ -9,12 +9,13 @@ import { SuperAdminContent } from "./SuperAdminPanel";
 interface AdminPanelProps {
   initialSettings: any;
   budgetItems: any[];
+  members: any[];
   authRole?: 'none' | 'admin' | 'superadmin';
   onExit?: () => void;
 }
 
 
-export default function AdminPanel({ initialSettings, budgetItems, authRole, onExit }: AdminPanelProps) {
+export default function AdminPanel({ initialSettings, budgetItems, members, authRole, onExit }: AdminPanelProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [availablePlans, setAvailablePlans] = useState<any[]>([]);
@@ -130,6 +131,51 @@ export default function AdminPanel({ initialSettings, budgetItems, authRole, onE
     }
   };
 
+  const addMember = async () => {
+    console.log("Attempting to add member. Current db ID:", db.app.options.projectId);
+    try {
+      const membersCollection = collection(db, "trip_settings", "main", "members");
+      console.log("Collection path:", membersCollection.path);
+      
+      const colors = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#06b6d4"];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      
+      await addDoc(membersCollection, {
+        name: "New Member",
+        color: randomColor,
+        createdAt: serverTimestamp()
+      });
+      console.log("Member added successfully");
+      showNotify('success');
+    } catch (error) {
+      console.error("Add Member Failed. Detailed Error:", error);
+      showNotify('error');
+      handleFirestoreError(error, OperationType.CREATE, "trip_settings/main/members");
+    }
+  };
+
+  const removeMember = async (id: string) => {
+    try {
+      const memberDoc = doc(db, "trip_settings", "main", "members", id);
+      await deleteDoc(memberDoc);
+      showNotify('success');
+    } catch (error) {
+      showNotify('error');
+      handleFirestoreError(error, OperationType.DELETE, `trip_settings/main/members/${id}`);
+    }
+  };
+
+  const updateMemberField = async (id: string, field: string, value: string) => {
+    try {
+      const memberDoc = doc(db, "trip_settings", "main", "members", id);
+      await updateDoc(memberDoc, { [field]: value });
+      return true;
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `trip_settings/main/members/${id}`);
+      return false;
+    }
+  };
+
   // ----------------------------------------
 
   if (!initialSettings) return null;
@@ -177,14 +223,14 @@ export default function AdminPanel({ initialSettings, budgetItems, authRole, onE
                 <button 
                   onClick={() => setAdminViewMode('dashboard')}
                   className={cn(
-                    "px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all",
+                    "px-5 py-2.5 rounded-[10px] text-[9px] font-black uppercase tracking-widest transition-all",
                     adminViewMode === 'dashboard' ? "bg-white dark:bg-zinc-800 text-black dark:text-white shadow-xl" : "opacity-30 hover:opacity-100"
                   )}
                 >Dashboard</button>
                 <button 
                   onClick={() => setAdminViewMode('architect')}
                   className={cn(
-                    "px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all",
+                    "px-5 py-2.5 rounded-[10px] text-[9px] font-black uppercase tracking-widest transition-all",
                     adminViewMode === 'architect' ? "bg-purple-600 text-white shadow-xl shadow-purple-600/20" : "opacity-30 hover:opacity-100"
                   )}
                 >Architect</button>
@@ -314,6 +360,48 @@ export default function AdminPanel({ initialSettings, budgetItems, authRole, onE
             </div>
           </div>
 
+          {/* Group Member Management */}
+          <div className="space-y-12">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
+              <div className="flex items-center gap-6">
+                <div className="p-4 glass rounded-2xl shadow-xl text-blue-500">
+                  <UserPlus size={32} />
+                </div>
+                <div className="space-y-1">
+                  <h2 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-[var(--foreground)]">Trip Participants</h2>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400">
+                    Managing {members.length} explorers
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={addMember} 
+                className="flex items-center gap-2 px-8 py-3.5 glass rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-black/[0.04] dark:hover:bg-white/10 transition-all border border-black/[0.03] dark:border-white/10 shadow-xl text-[var(--foreground)]"
+              >
+                <Plus size={16} className="text-blue-600 dark:text-blue-400" /> Add Member
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <AnimatePresence mode="popLayout">
+                {members.map((member) => (
+                  <MemberCard 
+                    key={member.id} 
+                    member={member} 
+                    onUpdate={updateMemberField} 
+                    onRemove={removeMember}
+                    onNotify={showNotify}
+                  />
+                ))}
+              </AnimatePresence>
+              {members.length === 0 && (
+                <div className="col-span-full py-12 text-center opacity-20 border-2 border-dashed border-white/10 rounded-[2rem]">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em]">Assign explorers to track their shares</p>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="space-y-12">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
               <div className="flex items-center gap-6">
@@ -411,5 +499,68 @@ export default function AdminPanel({ initialSettings, budgetItems, authRole, onE
       )}
 
     </div>
+  );
+}
+
+function MemberCard({ member, onUpdate, onRemove, onNotify }: { member: any, onUpdate: any, onRemove: any, onNotify: any }) {
+  const [name, setName] = useState(member.name);
+  const [initials, setInitials] = useState(member.initials || "");
+
+  useEffect(() => {
+    setName(member.name);
+    setInitials(member.initials || "");
+  }, [member.id, member.name, member.initials]);
+
+  const handleSaveName = async () => {
+    if (name === member.name) return;
+    const success = await onUpdate(member.id, 'name', name);
+    if (success) onNotify('success');
+  };
+
+  const handleSaveInitials = async () => {
+    const finalInitials = initials.toUpperCase();
+    if (finalInitials === (member.initials || "")) return;
+    const success = await onUpdate(member.id, 'initials', finalInitials);
+    if (success) onNotify('success');
+  };
+
+  const computedInitials = member.name?.split(' ').filter(Boolean).map((n: string) => n[0]).join('').toUpperCase().substring(0, 3);
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      className="relative glass p-6 rounded-[2rem] border border-black/[0.05] dark:border-white/10 flex items-center gap-4 group hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-all"
+    >
+      <div 
+        className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-sm shrink-0 shadow-lg relative overflow-hidden"
+        style={{ backgroundColor: member.color || "#ccc" }}
+      >
+        <input 
+          type="text"
+          value={initials || computedInitials}
+          onChange={(e) => setInitials(e.target.value)}
+          onBlur={handleSaveInitials}
+          onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
+          className="absolute inset-0 w-full h-full bg-transparent border-none outline-none text-center font-black uppercase text-xs"
+          maxLength={3}
+        />
+      </div>
+      <input 
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        onBlur={handleSaveName}
+        onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
+        className="flex-1 bg-transparent border-none outline-none font-bold text-[var(--foreground)] text-sm"
+      />
+      <button 
+        onClick={() => onRemove(member.id)}
+        className="absolute top-4 right-4 p-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/10 rounded-lg shadow-sm"
+      >
+        <Trash2 size={14} />
+      </button>
+    </motion.div>
   );
 }
