@@ -544,10 +544,14 @@ export default function RouteMap({ activePlanId = "4-day" }: { activePlanId?: st
         <div className={cn("absolute left-0 right-0 bottom-26 md:bottom-8 z-[60] transition-all px-6", (activeMode === "explore" && !selectedPlace) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none")}>
           <div className="flex gap-4 overflow-x-auto no-scrollbar snap-x">
             {places.map((place) => (
-              <button key={place.id} onClick={() => setSelectedPlace(place)} className={cn(
-                "flex-shrink-0 snap-center p-3.5 rounded-[2rem] shadow-2xl flex items-center gap-3 border transition-all hover:scale-105 active:scale-95 w-64 md:w-60 frost-max",
-                theme === "dark" ? "dark" : "light"
-              )}>
+              <button key={place.id} 
+                onClick={() => setSelectedPlace(place)} 
+                style={{ backdropFilter: 'blur(16px) saturate(140%)', WebkitBackdropFilter: 'blur(16px) saturate(140%)', transform: 'translateZ(0)' }}
+                className={cn(
+                  "flex-shrink-0 snap-center p-3.5 rounded-[2rem] shadow-2xl flex items-center gap-3 border transition-all hover:scale-105 active:scale-95 w-64 md:w-60 frost-max",
+                  theme === "dark" ? "dark" : "light"
+                )}
+              >
                 <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0"><img src={place.image} className="w-full h-full object-cover" /></div>
                 <div className="text-left overflow-hidden">
                   <p className="text-[7px] font-black uppercase tracking-widest text-emerald-600 mb-0.5">{place.category}</p>
