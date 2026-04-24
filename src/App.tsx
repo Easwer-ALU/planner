@@ -224,13 +224,13 @@ export default function App() {
     <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] transition-all duration-700 font-sans selection:bg-emerald-600/20 relative">
       
       {/* Hardware Accelerated Background Layer */}
-      <div className="fixed inset-0 pointer-events-none z-0 bg-dots opacity-100 transition-opacity duration-1000" aria-hidden="true" />
+      {/* <div className="fixed inset-0 pointer-events-none z-0 bg-dots opacity-100 transition-opacity duration-1000" aria-hidden="true" /> */}
       
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Desktop Floating Nav */}
         <nav 
-          style={{ backdropFilter: 'blur(20px) saturate(160%)', WebkitBackdropFilter: 'blur(20px) saturate(160%)' }}
-          className="hidden md:flex fixed top-4 lg:top-8 left-1/2 -translate-x-1/2 z-50 glass px-10 lg:px-12 py-4 lg:py-5 rounded-full items-center gap-8 lg:gap-10 shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-black/[0.04] dark:border-white/10 transition-all duration-700 max-w-[92vw]"
+          style={{ backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', transform: 'translateX(-50%) translateZ(0)' }}
+          className="hidden md:flex fixed top-4 lg:top-8 left-1/2 z-50 glass px-10 lg:px-12 py-4 lg:py-5 rounded-full items-center gap-8 lg:gap-10 shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-black/[0.04] dark:border-white/10 transition-all duration-700 max-w-[92vw] overflow-x-auto no-scrollbar"
         >
         <div className="flex items-center gap-3 text-emerald-700 dark:text-backwater-blue mr-6 group cursor-pointer shrink-0" onClick={() => setActiveTab("overview")}>
           <Palmtree size={24} className="group-hover:rotate-12 transition-transform duration-500" />
