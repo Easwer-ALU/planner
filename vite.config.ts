@@ -33,6 +33,11 @@ export default defineConfig(({ mode }) => {
         }
       })
     ],
+    build: {
+      target: 'esnext',
+      cssTarget: 'chrome80', // Ensure modern CSS features are preserved
+      chunkSizeWarningLimit: 1000, // Address the user's warning log
+    },
     define: {},
     resolve: {
       alias: {

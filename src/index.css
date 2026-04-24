@@ -54,17 +54,18 @@
   background-color: var(--card-bg);
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  transition: background-color 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease, transform 0.6s ease;
   isolation: isolate;
-  transform: translateZ(0); /* Force GPU layering */
+  transform: translateZ(0); 
   will-change: backdrop-filter;
 }
 
 .dark .glass {
-  backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  background-color: rgba(15, 21, 24, 0.65); /* Slightly darker for production contrast */
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
 }
 
 .frost-max {
