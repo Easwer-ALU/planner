@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Eye, EyeOff, Calendar, Receipt, Plus, Trash2, Users, LogOut, CheckCircle2, AlertCircle, X, ChevronDown, Hammer, LayoutGrid, UserPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -137,10 +137,10 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
     try {
       const membersCollection = collection(db, "trip_settings", "main", "members");
       console.log("Collection path:", membersCollection.path);
-      
+
       const colors = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#06b6d4"];
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
-      
+
       await addDoc(membersCollection, {
         name: "New Member",
         color: randomColor,
@@ -186,11 +186,11 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
 
   return (
     <div className="min-h-screen pt-12 md:pt-28 pb-32 px-4 md:px-12 max-w-5xl mx-auto space-y-12 md:space-y-16">
-      
+
       {/* Nice Toast Notification */}
       <AnimatePresence>
         {saveStatus !== 'idle' && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9 }}
@@ -216,19 +216,19 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
           <p className="text-xs font-black uppercase tracking-[0.4em] opacity-40 text-[var(--foreground)]">The Mission Control</p>
           <div className="flex flex-col sm:flex-row sm:items-center gap-6 md:gap-8">
             <h1 className="font-serif text-5xl md:text-6xl font-bold tracking-tight text-[var(--foreground)]">
-              {adminViewMode === 'dashboard' ? "Trail Settings" : "Master Architect"}
+              {adminViewMode === 'dashboard' ? "Trail Settings" : "Command Center"}
             </h1>
-            
+
             {authRole === 'superadmin' && (
               <div className="flex w-fit bg-black/5 dark:bg-white/5 p-1.5 rounded-2xl border border-black/10 dark:border-white/10 shadow-inner">
-                <button 
+                <button
                   onClick={() => setAdminViewMode('dashboard')}
                   className={cn(
                     "px-5 py-2.5 rounded-[10px] text-[9px] font-black uppercase tracking-widest transition-all",
                     adminViewMode === 'dashboard' ? "bg-white dark:bg-zinc-800 text-black dark:text-white shadow-xl" : "opacity-30 hover:opacity-100"
                   )}
                 >Dashboard</button>
-                <button 
+                <button
                   onClick={() => setAdminViewMode('architect')}
                   className={cn(
                     "px-5 py-2.5 rounded-[10px] text-[9px] font-black uppercase tracking-widest transition-all",
@@ -246,8 +246,8 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
             <span className="text-[11px] font-black uppercase tracking-[0.2em]">Live Sync Active</span>
           </div>
-          <button 
-            onClick={onExit} 
+          <button
+            onClick={onExit}
             className="px-6 py-3.5 glass rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black/[0.04] dark:hover:bg-white/10 transition-all shadow-xl text-[var(--foreground)]"
           >
             Exit Control
@@ -289,7 +289,7 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
                 </div>
               </div>
               <div className="relative" ref={dropdownRef}>
-                <button 
+                <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="w-full py-4 px-6 glass rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 transition-all text-[var(--foreground)] border border-black/[0.03] dark:border-white/10 shadow-sm"
                 >
@@ -299,7 +299,7 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
 
                 <AnimatePresence>
                   {isDropdownOpen && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -365,7 +365,7 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
           <div className="space-y-12">
             {/* Members List Header (now a toggle on mobile) */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
-              <button 
+              <button
                 onClick={() => setIsMembersExpanded(!isMembersExpanded)}
                 className="flex items-center gap-6 text-left group"
               >
@@ -390,8 +390,8 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
                   </p>
                 </div>
               </button>
-              <button 
-                onClick={addMember} 
+              <button
+                onClick={addMember}
                 className="flex items-center gap-2 px-8 py-3.5 glass rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-black/[0.04] dark:hover:bg-white/10 transition-all border border-black/[0.03] dark:border-white/10 shadow-xl text-[var(--foreground)]"
               >
                 <UserPlus size={16} className="text-blue-600 dark:text-blue-400" /> Add Member
@@ -400,7 +400,7 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
 
             <AnimatePresence>
               {(isMembersExpanded || window.innerWidth > 768) && (
-                <motion.div 
+                <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -409,10 +409,10 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
                     <AnimatePresence mode="popLayout">
                       {members.map((member) => (
-                        <MemberCard 
-                          key={member.id} 
-                          member={member} 
-                          onUpdate={updateMemberField} 
+                        <MemberCard
+                          key={member.id}
+                          member={member}
+                          onUpdate={updateMemberField}
                           onRemove={removeMember}
                           onNotify={showNotify}
                         />
@@ -448,8 +448,8 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
                   </p>
                 </div>
               </div>
-              <button 
-                onClick={addBudgetItem} 
+              <button
+                onClick={addBudgetItem}
                 className="flex items-center gap-2 px-8 py-3.5 glass rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-black/[0.04] dark:hover:bg-white/10 transition-all border border-black/[0.03] dark:border-white/10 shadow-xl text-[var(--foreground)]"
               >
                 <Plus size={16} className="text-emerald-600 dark:text-backwater-blue" /> Add Row
@@ -459,7 +459,7 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
             <div className="grid grid-cols-1 gap-6">
               <AnimatePresence mode="popLayout">
                 {currentPlanBudget.map((item) => (
-                  <motion.div 
+                  <motion.div
                     key={item.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -469,7 +469,7 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                       <div className="space-y-3">
                         <label className="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 ml-4 text-[var(--foreground)]">Category</label>
-                        <input 
+                        <input
                           type="text"
                           defaultValue={item.category}
                           placeholder="e.g., Transport"
@@ -479,7 +479,7 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
                       </div>
                       <div className="space-y-3">
                         <label className="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 ml-4 text-[var(--foreground)]">Cost (₹)</label>
-                        <input 
+                        <input
                           type="number"
                           defaultValue={item.cost}
                           placeholder="2500"
@@ -491,7 +491,7 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
 
                     <div className="space-y-3">
                       <label className="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 ml-4 text-[var(--foreground)]">Notes & Details</label>
-                      <input 
+                      <input
                         type="text"
                         defaultValue={item.detail}
                         placeholder="Train from Kochi..."
@@ -502,7 +502,7 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
 
                     <div className="flex items-center justify-between pt-4 border-t border-white/5">
                       <p className="text-[8px] font-black uppercase tracking-widest opacity-20">Last edited: {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleTimeString() : 'Syncing...'}</p>
-                      <button 
+                      <button
                         onClick={() => removeBudgetItem(item.id)}
                         className="p-3 bg-red-500/10 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"
                       >
@@ -512,7 +512,7 @@ export default function AdminPanel({ initialSettings, budgetItems, members, auth
                   </motion.div>
                 ))}
               </AnimatePresence>
-              
+
               {currentPlanBudget.length === 0 && (
                 <div className="text-center py-20 opacity-20 border-2 border-dashed border-white/10 rounded-[3rem]">
                   <p className="text-sm font-black uppercase tracking-widest">No budget items added yet</p>
@@ -561,17 +561,17 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, onUpdate, onRemove, onN
   const computedInitials = member.name?.split(' ').filter(Boolean).map((n: string) => n[0]).join('').toUpperCase().substring(0, 3);
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       className="relative glass p-6 rounded-[2rem] border border-black/[0.05] dark:border-white/10 flex items-center gap-4 group hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-all"
     >
-      <div 
+      <div
         className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-sm shrink-0 shadow-lg relative overflow-hidden"
         style={{ backgroundColor: member.color || "#ccc" }}
       >
-        <input 
+        <input
           type="text"
           value={initials || computedInitials}
           onChange={(e) => setInitials(e.target.value)}
@@ -581,7 +581,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, onUpdate, onRemove, onN
           maxLength={3}
         />
       </div>
-      <input 
+      <input
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -589,7 +589,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, onUpdate, onRemove, onN
         onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
         className="flex-1 bg-transparent border-none outline-none font-bold text-[var(--foreground)] text-sm"
       />
-      <button 
+      <button
         onClick={() => onRemove(member.id)}
         className="absolute top-4 right-4 p-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/10 rounded-lg shadow-sm"
       >
